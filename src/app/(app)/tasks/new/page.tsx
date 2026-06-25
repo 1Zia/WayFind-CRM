@@ -1,8 +1,15 @@
-﻿import { TaskForm } from "@/components/tasks/task-form";
+import { ForbiddenState } from "@/components/shared/forbidden-state";
+import { TaskForm } from "@/components/tasks/task-form";
 import { getTaskFormOptions } from "@/lib/actions/tasks";
 
 export default async function TasksNewPage() {
-  const options = await getTaskFormOptions("tasks:create");
+  let options;
+
+  try {
+    options = await getTaskFormOptions("tasks:create");
+  } catch {
+    return <ForbiddenState />;
+  }
 
   return (
     <>
@@ -13,6 +20,5 @@ export default async function TasksNewPage() {
 
       <TaskForm projects={options.projects} users={options.users} />
     </>
-  );}
-
-
+  );
+}

@@ -1,7 +1,15 @@
 import Link from "next/link";
-import { navigationItems } from "@/config/navigation";
 
-export function AppSidebar() {
+import { navigationItems } from "@/config/navigation";
+import { requireUser } from "@/lib/auth";
+import { canAccessRoute } from "@/lib/permissions";
+
+export async function AppSidebar() {
+  const user = await requireUser();
+  const visibleItems = navigationItems.filter((item) =>
+    canAccessRoute(user, item.href),
+  );
+
   return (
     <aside className="hidden min-h-screen w-64 border-r bg-white px-4 py-6 lg:block">
       <div className="mb-8">
@@ -12,7 +20,7 @@ export function AppSidebar() {
       </div>
 
       <nav className="space-y-1">
-        {navigationItems.map((item) => {
+        {visibleItems.map((item) => {
           const Icon = item.icon;
 
           return (

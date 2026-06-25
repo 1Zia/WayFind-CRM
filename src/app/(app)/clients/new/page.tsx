@@ -1,6 +1,16 @@
-﻿import { ClientForm } from "@/components/clients/client-form";
+import { ClientForm } from "@/components/clients/client-form";
+import { ForbiddenState } from "@/components/shared/forbidden-state";
+import { requireUser } from "@/lib/auth";
+import { requirePermission } from "@/lib/permissions";
 
-export default function NewClientPage() {
+export default async function NewClientPage() {
+  try {
+    const user = await requireUser();
+    requirePermission(user, "clients:create");
+  } catch {
+    return <ForbiddenState />;
+  }
+
   return (
     <>
       <div className="mb-6">
@@ -14,5 +24,3 @@ export default function NewClientPage() {
     </>
   );
 }
-
-

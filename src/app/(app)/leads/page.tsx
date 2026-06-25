@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { LeadPipeline } from "@/components/leads/lead-pipeline";
 import { LeadTable } from "@/components/leads/lead-table";
+import { ForbiddenState } from "@/components/shared/forbidden-state";
 import { getLeads } from "@/lib/actions/leads";
 import { requireUser } from "@/lib/auth";
 import { hasPermission } from "@/lib/permissions";
@@ -26,7 +27,7 @@ export default async function LeadsPage({ searchParams }: LeadsPageProps) {
       requireUser(),
     ]);
   } catch {
-    return <ForbiddenMessage />;
+    return <ForbiddenState />;
   }
 
   return (
@@ -39,12 +40,14 @@ export default async function LeadsPage({ searchParams }: LeadsPageProps) {
           </p>
         </div>
 
-        <Link
-          href="/leads/new"
-          className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
-        >
-          New Lead
-        </Link>
+        {hasPermission(user, "leads:create") ? (
+          <Link
+            href="/leads/new"
+            className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
+          >
+            New Lead
+          </Link>
+        ) : null}
       </div>
 
       <div className="mb-6">
@@ -77,18 +80,5 @@ export default async function LeadsPage({ searchParams }: LeadsPageProps) {
 
       <LeadTable canDelete={hasPermission(user, "leads:delete")} leads={leads} />
     </>
-  );
-}
-
-function ForbiddenMessage() {
-  return (
-    <div className="rounded-xl border bg-white p-6">
-      <h1 className="text-2xl font-semibold tracking-tight">
-        Leads access required
-      </h1>
-      <p className="mt-2 text-sm text-zinc-500">
-        Only super admins and project managers can manage leads.
-      </p>
-    </div>
   );
 }

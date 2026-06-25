@@ -29,12 +29,12 @@ const permissions = {
     "tasks:create",
     "tasks:update",
     "tasks:assign",
+    "reports:view",
     "documents:view",
     "documents:upload",
     "documents:create",
     "documents:update",
     "documents:delete",
-    "team:view",
   ],
 
   employee: [
@@ -91,4 +91,55 @@ export function requirePermission(user: User, permission: Permission) {
   if (!hasPermission(user, permission)) {
     throw new Error("Forbidden");
   }
+}
+
+export function canAccessRoute(user: User, href: string) {
+  if (href.startsWith("/dashboard")) {
+    return hasPermission(user, "dashboard:view");
+  }
+
+  if (href.startsWith("/clients")) {
+    return hasPermission(user, "clients:view");
+  }
+
+  if (href.startsWith("/leads")) {
+    return hasPermission(user, "leads:view");
+  }
+
+  if (href.startsWith("/projects")) {
+    return hasPermission(user, "projects:view");
+  }
+
+  if (href.startsWith("/tasks")) {
+    return (
+      hasPermission(user, "tasks:view") ||
+      hasPermission(user, "tasks:view_assigned")
+    );
+  }
+
+  if (href.startsWith("/finance")) {
+    return hasPermission(user, "finance:view");
+  }
+
+  if (href.startsWith("/documents")) {
+    return hasPermission(user, "documents:view");
+  }
+
+  if (href.startsWith("/reports")) {
+    return hasPermission(user, "reports:view");
+  }
+
+  if (href.startsWith("/audit-logs")) {
+    return user.role === "super_admin";
+  }
+
+  if (href.startsWith("/team")) {
+    return user.role === "super_admin";
+  }
+
+  if (href.startsWith("/notifications") || href.startsWith("/settings")) {
+    return true;
+  }
+
+  return false;
 }

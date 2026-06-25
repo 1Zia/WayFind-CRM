@@ -1,4 +1,5 @@
 import { LeadForm } from "@/components/leads/lead-form";
+import { ForbiddenState } from "@/components/shared/forbidden-state";
 import { requireUser } from "@/lib/auth";
 import { requirePermission } from "@/lib/permissions";
 
@@ -7,7 +8,7 @@ export default async function NewLeadPage() {
     const user = await requireUser();
     requirePermission(user, "leads:create");
   } catch {
-    return <ForbiddenMessage />;
+    return <ForbiddenState />;
   }
 
   return (
@@ -21,18 +22,5 @@ export default async function NewLeadPage() {
 
       <LeadForm />
     </>
-  );
-}
-
-function ForbiddenMessage() {
-  return (
-    <div className="rounded-xl border bg-white p-6">
-      <h1 className="text-2xl font-semibold tracking-tight">
-        Leads access required
-      </h1>
-      <p className="mt-2 text-sm text-zinc-500">
-        Only super admins and project managers can create leads.
-      </p>
-    </div>
   );
 }

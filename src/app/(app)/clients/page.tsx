@@ -1,9 +1,19 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 
+import { ForbiddenState } from "@/components/shared/forbidden-state";
 import { getClients } from "@/lib/actions/clients";
+import { requireUser } from "@/lib/auth";
+import { hasPermission } from "@/lib/permissions";
 
 export default async function ClientsPage() {
-  const clients = await getClients();
+  let clients;
+  let user;
+
+  try {
+    [clients, user] = await Promise.all([getClients(), requireUser()]);
+  } catch {
+    return <ForbiddenState />;
+  }
 
   return (
     <>
@@ -15,12 +25,14 @@ export default async function ClientsPage() {
           </p>
         </div>
 
-        <Link
-          href="/clients/new"
-          className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
-        >
-          New Client
-        </Link>
+        {hasPermission(user, "clients:create") ? (
+          <Link
+            href="/clients/new"
+            className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
+          >
+            New Client
+          </Link>
+        ) : null}
       </div>
 
       <div className="overflow-hidden rounded-xl border bg-white">
@@ -69,5 +81,3 @@ export default async function ClientsPage() {
     </>
   );
 }
-
-

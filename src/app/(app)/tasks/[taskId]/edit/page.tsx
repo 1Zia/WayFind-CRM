@@ -1,4 +1,5 @@
-﻿import { TaskForm } from "@/components/tasks/task-form";
+import { ForbiddenState } from "@/components/shared/forbidden-state";
+import { TaskForm } from "@/components/tasks/task-form";
 import { getTaskById, getTaskFormOptions } from "@/lib/actions/tasks";
 
 export default async function TaskEditPage({
@@ -6,10 +7,18 @@ export default async function TaskEditPage({
 }: {
   params: { taskId: string };
 }) {
-  const [task, options] = await Promise.all([
-    getTaskById(params.taskId),
-    getTaskFormOptions("tasks:update"),
-  ]);
+  let data;
+
+  try {
+    data = await Promise.all([
+      getTaskById(params.taskId),
+      getTaskFormOptions("tasks:update"),
+    ]);
+  } catch {
+    return <ForbiddenState />;
+  }
+
+  const [task, options] = data;
 
   return (
     <>
@@ -33,6 +42,5 @@ export default async function TaskEditPage({
         }}
       />
     </>
-  );}
-
-
+  );
+}

@@ -1,8 +1,19 @@
-﻿import { ProjectForm } from "@/components/projects/project-form";
+import { ProjectForm } from "@/components/projects/project-form";
+import { ForbiddenState } from "@/components/shared/forbidden-state";
 import { getClients } from "@/lib/actions/clients";
+import { requireUser } from "@/lib/auth";
+import { requirePermission } from "@/lib/permissions";
 
 export default async function NewProjectPage() {
-  const clients = await getClients();
+  let clients;
+
+  try {
+    const user = await requireUser();
+    requirePermission(user, "projects:create");
+    clients = await getClients();
+  } catch {
+    return <ForbiddenState />;
+  }
 
   return (
     <>
@@ -13,6 +24,5 @@ export default async function NewProjectPage() {
 
       <ProjectForm clients={clients} />
     </>
-  );}
-
-
+  );
+}

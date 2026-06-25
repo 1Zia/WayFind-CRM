@@ -1,4 +1,5 @@
 import { LeadForm } from "@/components/leads/lead-form";
+import { ForbiddenState } from "@/components/shared/forbidden-state";
 import { getLeadById } from "@/lib/actions/leads";
 import { requireUser } from "@/lib/auth";
 import { requirePermission } from "@/lib/permissions";
@@ -15,7 +16,7 @@ export default async function EditLeadPage({
     requirePermission(user, "leads:update");
     lead = await getLeadById(params.leadId);
   } catch {
-    return <ForbiddenMessage />;
+    return <ForbiddenState />;
   }
 
   return (
@@ -42,18 +43,5 @@ export default async function EditLeadPage({
         }}
       />
     </>
-  );
-}
-
-function ForbiddenMessage() {
-  return (
-    <div className="rounded-xl border bg-white p-6">
-      <h1 className="text-2xl font-semibold tracking-tight">
-        Leads access required
-      </h1>
-      <p className="mt-2 text-sm text-zinc-500">
-        Only super admins and project managers can update leads.
-      </p>
-    </div>
   );
 }

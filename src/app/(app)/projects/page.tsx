@@ -1,10 +1,21 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 
+import { ForbiddenState } from "@/components/shared/forbidden-state";
 import { getClients } from "@/lib/actions/clients";
 import { getProjects } from "@/lib/actions/projects";
+import { requireUser } from "@/lib/auth";
+import { hasPermission } from "@/lib/permissions";
 
 export default async function ProjectsPage() {
-  const [projects, clients] = await Promise.all([getProjects(), getClients()]);
+  let data;
+
+  try {
+    data = await Promise.all([getProjects(), getClients(), requireUser()]);
+  } catch {
+    return <ForbiddenState />;
+  }
+
+  const [projects, clients, user] = data;
   const clientNames = new Map(
     clients.map((client) => [client.id, client.companyName]),
   );
@@ -19,12 +30,14 @@ export default async function ProjectsPage() {
           </p>
         </div>
 
-        <Link
-          href="/projects/new"
-          className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
-        >
-          New Project
-        </Link>
+        {hasPermission(user, "projects:create") ? (
+          <Link
+            href="/projects/new"
+            className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
+          >
+            New Project
+          </Link>
+        ) : null}
       </div>
 
       <div className="overflow-hidden rounded-xl border bg-white">
@@ -81,5 +94,3 @@ export default async function ProjectsPage() {
     </>
   );
 }
-
-

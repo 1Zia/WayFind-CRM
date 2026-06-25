@@ -1,17 +1,29 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 
+import { ForbiddenState } from "@/components/shared/forbidden-state";
 import { getClients } from "@/lib/actions/clients";
 import { getProjectById } from "@/lib/actions/projects";
+import { requireUser } from "@/lib/auth";
+import { hasPermission } from "@/lib/permissions";
 
 export default async function ProjectPage({
   params,
 }: {
   params: { projectId: string };
 }) {
-  const [project, clients] = await Promise.all([
-    getProjectById(params.projectId),
-    getClients(),
-  ]);
+  let data;
+
+  try {
+    data = await Promise.all([
+      getProjectById(params.projectId),
+      getClients(),
+      requireUser(),
+    ]);
+  } catch {
+    return <ForbiddenState />;
+  }
+
+  const [project, clients, user] = data;
   const client = clients.find((item) => item.id === project.clientId);
 
   return (
@@ -24,12 +36,14 @@ export default async function ProjectPage({
           <p className="mt-1 text-sm text-zinc-500">Project details</p>
         </div>
 
-        <Link
-          href={`/projects/${project.id}/edit`}
-          className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
-        >
-          Edit
-        </Link>
+        {hasPermission(user, "projects:update") ? (
+          <Link
+            href={`/projects/${project.id}/edit`}
+            className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
+          >
+            Edit
+          </Link>
+        ) : null}
       </div>
 
       <div className="rounded-xl border bg-white p-6">
@@ -66,5 +80,3 @@ export default async function ProjectPage({
     </>
   );
 }
-
-

@@ -1,12 +1,23 @@
 import { ClientForm } from "@/components/clients/client-form";
+import { ForbiddenState } from "@/components/shared/forbidden-state";
 import { getClientById } from "@/lib/actions/clients";
+import { requireUser } from "@/lib/auth";
+import { requirePermission } from "@/lib/permissions";
 
 export default async function ClientEditPage({
   params,
 }: {
   params: { clientId: string };
 }) {
-  const client = await getClientById(params.clientId);
+  let client;
+
+  try {
+    const user = await requireUser();
+    requirePermission(user, "clients:update");
+    client = await getClientById(params.clientId);
+  } catch {
+    return <ForbiddenState />;
+  }
 
   return (
     <>

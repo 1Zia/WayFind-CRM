@@ -69,3 +69,5 @@ export const navigationItems = [
     icon: Settings,
   },
 ];
+
+export type NavigationItem = (typeof navigationItems)[number];
