@@ -72,7 +72,12 @@ export function IncomeTable({
           {income.length === 0 && (
             <tr>
               <td colSpan={6} className="px-4 py-10 text-center text-zinc-500">
-                No income records found.
+                <div className="font-medium text-zinc-950">
+                  No income records yet.
+                </div>
+                <div className="mt-1 text-sm">
+                  Paid and pending income will appear here.
+                </div>
               </td>
             </tr>
           )}

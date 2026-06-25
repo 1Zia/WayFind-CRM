@@ -83,7 +83,12 @@ export default async function TasksPage() {
                   colSpan={7}
                   className="px-4 py-10 text-center text-zinc-500"
                 >
-                  No tasks found.
+                  <div className="font-medium text-zinc-950">
+                    No tasks yet.
+                  </div>
+                  <div className="mt-1 text-sm">
+                    Assigned and project tasks will appear here.
+                  </div>
                 </td>
               </tr>
             )}

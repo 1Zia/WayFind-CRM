@@ -71,7 +71,12 @@ export default async function ClientsPage() {
                   colSpan={5}
                   className="px-4 py-10 text-center text-zinc-500"
                 >
-                  No clients found.
+                  <div className="font-medium text-zinc-950">
+                    No clients yet.
+                  </div>
+                  <div className="mt-1 text-sm">
+                    Client records will appear here after they are created.
+                  </div>
                 </td>
               </tr>
             )}

@@ -59,7 +59,12 @@ export function AuditLogTable({ logs }: AuditLogTableProps) {
           {logs.length === 0 && (
             <tr>
               <td colSpan={6} className="px-4 py-10 text-center text-zinc-500">
-                No audit logs found.
+                <div className="font-medium text-zinc-950">
+                  No audit logs yet.
+                </div>
+                <div className="mt-1 text-sm">
+                  System activity will appear here after changes are made.
+                </div>
               </td>
             </tr>
           )}

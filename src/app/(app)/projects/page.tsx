@@ -84,7 +84,12 @@ export default async function ProjectsPage() {
                   colSpan={7}
                   className="px-4 py-10 text-center text-zinc-500"
                 >
-                  No projects found.
+                  <div className="font-medium text-zinc-950">
+                    No projects yet.
+                  </div>
+                  <div className="mt-1 text-sm">
+                    Project work will appear here after it is created.
+                  </div>
                 </td>
               </tr>
             )}

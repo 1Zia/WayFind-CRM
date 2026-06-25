@@ -110,7 +110,10 @@ export function LeadTable({ leads, canDelete }: LeadTableProps) {
           {leads.length === 0 && (
             <tr>
               <td colSpan={8} className="px-4 py-10 text-center text-zinc-500">
-                No leads found.
+                <div className="font-medium text-zinc-950">No leads yet.</div>
+                <div className="mt-1 text-sm">
+                  Leads will appear here as they enter the sales pipeline.
+                </div>
               </td>
             </tr>
           )}

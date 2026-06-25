@@ -70,7 +70,12 @@ export function NotificationList({
       <div className="overflow-hidden rounded-xl border bg-white">
         {notifications.length === 0 ? (
           <div className="px-4 py-10 text-center text-sm text-zinc-500">
-            No notifications yet.
+            <div className="font-medium text-zinc-950">
+              No notifications yet.
+            </div>
+            <div className="mt-1">
+              System alerts and activity updates will appear here.
+            </div>
           </div>
         ) : (
           <div className="divide-y">

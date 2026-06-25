@@ -1,3 +1,10 @@
+import Link from "next/link";
+
+import { EmptyState } from "@/components/shared/empty-state";
+import { MetricCard } from "@/components/shared/metric-card";
+import { PageHeader } from "@/components/shared/page-header";
+import { SectionCard } from "@/components/shared/section-card";
+import { StatusBadge } from "@/components/shared/status-badge";
 import { getDashboardStats } from "@/lib/actions/dashboard";
 
 function formatMoney(value: number) {
@@ -8,35 +15,141 @@ function formatMoney(value: number) {
   }).format(value);
 }
 
+function formatDate(value: Date | string | null) {
+  if (!value) {
+    return "-";
+  }
+
+  return new Intl.DateTimeFormat("en-PK", {
+    dateStyle: "medium",
+  }).format(new Date(value));
+}
+
 export default async function DashboardPage() {
   const stats = await getDashboardStats();
 
   return (
     <>
-      <div className="mb-6">
-        <h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
-        <p className="mt-1 text-sm text-zinc-500">
-          Overview of your company operations.
-        </p>
+      <PageHeader
+        title="Dashboard"
+        description="Overview of your company operations."
+      />
+
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <MetricCard title="Total Clients" value={stats.totalClients} />
+        <MetricCard title="Total Leads" value={stats.totalLeads} />
+        <MetricCard title="Active Projects" value={stats.activeProjects} />
+        <MetricCard title="Pending Tasks" value={stats.pendingTasks} />
+        <MetricCard title="Revenue" value={formatMoney(stats.revenue)} />
+        <MetricCard title="Expenses" value={formatMoney(stats.expenses)} />
+        <MetricCard title="Profit / Loss" value={formatMoney(stats.profitLoss)} />
+        <MetricCard
+          title="Unread Notifications"
+          value={stats.unreadNotifications}
+        />
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-6">
-        <StatCard title="Total Clients" value={stats.totalClients} />
-        <StatCard title="Total Leads" value={stats.totalLeads} />
-        <StatCard title="Active Projects" value={stats.activeProjects} />
-        <StatCard title="Pending Tasks" value={stats.pendingTasks} />
-        <StatCard title="Revenue" value={formatMoney(stats.revenue)} />
-        <StatCard title="Expenses" value={formatMoney(stats.expenses)} />
+      <div className="mt-6 grid gap-6 xl:grid-cols-2">
+        <SectionCard title="Recent Activity">
+          {stats.recentActivity.length > 0 ? (
+            <div className="divide-y">
+              {stats.recentActivity.map((item) => (
+                <div key={item.id} className="py-3 first:pt-0 last:pb-0">
+                  <p className="text-sm font-medium">{item.description}</p>
+                  <p className="mt-1 text-xs text-zinc-500">
+                    {item.entityType} - {item.action} -{" "}
+                    {formatDate(item.createdAt)}
+                  </p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <EmptyState
+              title="No recent activity"
+              description="Audit activity will appear here as records change."
+            />
+          )}
+        </SectionCard>
+
+        <SectionCard title="Upcoming Tasks">
+          {stats.upcomingTasks.length > 0 ? (
+            <div className="divide-y">
+              {stats.upcomingTasks.map((task) => (
+                <Link
+                  key={task.id}
+                  href={`/tasks/${task.id}`}
+                  className="flex items-center justify-between gap-4 py-3 text-sm first:pt-0 last:pb-0"
+                >
+                  <span className="font-medium">{task.title}</span>
+                  <span className="text-zinc-500">{formatDate(task.dueDate)}</span>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <EmptyState
+              title="No upcoming tasks"
+              description="Open tasks with due dates will appear here."
+            />
+          )}
+        </SectionCard>
+
+        <SectionCard title="Recent Projects">
+          {stats.recentProjects.length > 0 ? (
+            <div className="divide-y">
+              {stats.recentProjects.map((project) => (
+                <Link
+                  key={project.id}
+                  href={`/projects/${project.id}`}
+                  className="flex items-center justify-between gap-4 py-3 text-sm first:pt-0 last:pb-0"
+                >
+                  <div>
+                    <p className="font-medium">{project.name}</p>
+                    <p className="text-xs text-zinc-500">
+                      Deadline {formatDate(project.deadline)}
+                    </p>
+                  </div>
+                  <StatusBadge>{project.status.replace("_", " ")}</StatusBadge>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <EmptyState
+              title="No recent projects"
+              description="Projects will appear here after they are created."
+            />
+          )}
+        </SectionCard>
+
+        <SectionCard title="Recent Leads">
+          {stats.recentLeads.length > 0 ? (
+            <div className="divide-y">
+              {stats.recentLeads.map((lead) => (
+                <Link
+                  key={lead.id}
+                  href={`/leads/${lead.id}`}
+                  className="flex items-center justify-between gap-4 py-3 text-sm first:pt-0 last:pb-0"
+                >
+                  <div>
+                    <p className="font-medium">{lead.leadName}</p>
+                    <p className="text-xs text-zinc-500">
+                      {lead.company ?? "No company"} - Follow-up{" "}
+                      {formatDate(lead.followUpDate)}
+                    </p>
+                  </div>
+                  <StatusBadge tone="info">
+                    {lead.status.replace("_", " ")}
+                  </StatusBadge>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <EmptyState
+              title="No recent leads"
+              description="Leads will appear here after they are created."
+            />
+          )}
+        </SectionCard>
       </div>
     </>
-  );
-}
-
-function StatCard({ title, value }: { title: string; value: string | number }) {
-  return (
-    <div className="rounded-xl border bg-white p-5">
-      <p className="text-sm text-zinc-500">{title}</p>
-      <p className="mt-2 text-3xl font-semibold tracking-tight">{value}</p>
-    </div>
   );
 }

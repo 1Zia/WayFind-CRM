@@ -8,6 +8,7 @@ import {
   Wallet,
   FileText,
   Bell,
+  UserCog,
   ShieldCheck,
   Settings,
 } from "lucide-react";
@@ -17,11 +18,6 @@ export const navigationItems = [
     title: "Dashboard",
     href: "/dashboard",
     icon: LayoutDashboard,
-  },
-  {
-    title: "Reports",
-    href: "/reports",
-    icon: BarChart3,
   },
   {
     title: "Clients",
@@ -59,9 +55,19 @@ export const navigationItems = [
     icon: Bell,
   },
   {
+    title: "Reports",
+    href: "/reports",
+    icon: BarChart3,
+  },
+  {
     title: "Audit Logs",
     href: "/audit-logs",
     icon: ShieldCheck,
+  },
+  {
+    title: "Team / Users",
+    href: "/team/users",
+    icon: UserCog,
   },
   {
     title: "Settings",

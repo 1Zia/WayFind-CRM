@@ -147,7 +147,12 @@ export function DocumentTable({
           {documents.length === 0 && (
             <tr>
               <td colSpan={7} className="px-4 py-10 text-center text-zinc-500">
-                No documents found.
+                <div className="font-medium text-zinc-950">
+                  No documents yet.
+                </div>
+                <div className="mt-1 text-sm">
+                  Uploaded document metadata will appear here.
+                </div>
               </td>
             </tr>
           )}

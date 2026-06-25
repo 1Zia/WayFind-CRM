@@ -71,7 +71,12 @@ export function ExpenseTable({ expenses, users = [] }: ExpenseTableProps) {
           {expenses.length === 0 && (
             <tr>
               <td colSpan={6} className="px-4 py-10 text-center text-zinc-500">
-                No expenses found.
+                <div className="font-medium text-zinc-950">
+                  No expenses yet.
+                </div>
+                <div className="mt-1 text-sm">
+                  Operating expenses will appear here.
+                </div>
               </td>
             </tr>
           )}

@@ -62,7 +62,10 @@ export function UserTable({ users }: UserTableProps) {
           {users.length === 0 && (
             <tr>
               <td colSpan={5} className="px-4 py-10 text-center text-zinc-500">
-                No users found.
+                <div className="font-medium text-zinc-950">No users yet.</div>
+                <div className="mt-1 text-sm">
+                  Team members will appear here after they sign in or sync.
+                </div>
               </td>
             </tr>
           )}
