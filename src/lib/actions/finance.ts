@@ -26,6 +26,7 @@ function revalidateFinancePaths(id?: string) {
   revalidatePath("/finance/expenses");
   revalidatePath("/finance/invoices");
   revalidatePath("/finance/reports");
+  revalidatePath("/reports");
 
   if (id) {
     revalidatePath(`/finance/${id}`);

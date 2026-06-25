@@ -142,6 +142,7 @@ export async function createTask(input: TaskInput) {
   revalidatePath("/notifications");
   revalidatePath("/tasks");
   revalidatePath("/dashboard");
+  revalidatePath("/reports");
 
   return {
     success: true,
@@ -191,6 +192,7 @@ export async function updateTaskStatus(
   revalidatePath("/tasks");
   revalidatePath(`/tasks/${taskId}`);
   revalidatePath("/dashboard");
+  revalidatePath("/reports");
 
   return {
     success: true,
@@ -236,6 +238,7 @@ export async function updateTask(id: string, input: TaskInput) {
   revalidatePath("/tasks");
   revalidatePath(`/tasks/${taskId}`);
   revalidatePath("/dashboard");
+  revalidatePath("/reports");
 
   return {
     success: true,

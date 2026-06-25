@@ -36,13 +36,28 @@ export default async function DashboardPage() {
       />
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <MetricCard title="Total Clients" value={stats.totalClients} />
-        <MetricCard title="Total Leads" value={stats.totalLeads} />
-        <MetricCard title="Active Projects" value={stats.activeProjects} />
-        <MetricCard title="Pending Tasks" value={stats.pendingTasks} />
-        <MetricCard title="Revenue" value={formatMoney(stats.revenue)} />
-        <MetricCard title="Expenses" value={formatMoney(stats.expenses)} />
-        <MetricCard title="Profit / Loss" value={formatMoney(stats.profitLoss)} />
+        {stats.permissions.canViewClients ? (
+          <MetricCard title="Total Clients" value={stats.totalClients} />
+        ) : null}
+        {stats.permissions.canViewLeads ? (
+          <MetricCard title="Total Leads" value={stats.totalLeads} />
+        ) : null}
+        {stats.permissions.canViewProjects ? (
+          <MetricCard title="Active Projects" value={stats.activeProjects} />
+        ) : null}
+        {stats.permissions.canViewTasks ? (
+          <MetricCard title="Pending Tasks" value={stats.pendingTasks} />
+        ) : null}
+        {stats.permissions.canViewFinance ? (
+          <>
+            <MetricCard title="Revenue" value={formatMoney(stats.revenue)} />
+            <MetricCard title="Expenses" value={formatMoney(stats.expenses)} />
+            <MetricCard
+              title="Profit / Loss"
+              value={formatMoney(stats.profitLoss)}
+            />
+          </>
+        ) : null}
         <MetricCard
           title="Unread Notifications"
           value={stats.unreadNotifications}
@@ -50,50 +65,57 @@ export default async function DashboardPage() {
       </div>
 
       <div className="mt-6 grid gap-6 xl:grid-cols-2">
-        <SectionCard title="Recent Activity">
-          {stats.recentActivity.length > 0 ? (
-            <div className="divide-y">
-              {stats.recentActivity.map((item) => (
-                <div key={item.id} className="py-3 first:pt-0 last:pb-0">
-                  <p className="text-sm font-medium">{item.description}</p>
-                  <p className="mt-1 text-xs text-zinc-500">
-                    {item.entityType} - {item.action} -{" "}
-                    {formatDate(item.createdAt)}
-                  </p>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <EmptyState
-              title="No recent activity"
-              description="Audit activity will appear here as records change."
-            />
-          )}
-        </SectionCard>
+        {stats.permissions.canViewAuditLogs ? (
+          <SectionCard title="Recent Activity">
+            {stats.recentActivity.length > 0 ? (
+              <div className="divide-y">
+                {stats.recentActivity.map((item) => (
+                  <div key={item.id} className="py-3 first:pt-0 last:pb-0">
+                    <p className="text-sm font-medium">{item.description}</p>
+                    <p className="mt-1 text-xs text-zinc-500">
+                      {item.entityType} - {item.action} -{" "}
+                      {formatDate(item.createdAt)}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <EmptyState
+                title="No recent activity"
+                description="Audit activity will appear here as records change."
+              />
+            )}
+          </SectionCard>
+        ) : null}
 
-        <SectionCard title="Upcoming Tasks">
-          {stats.upcomingTasks.length > 0 ? (
-            <div className="divide-y">
-              {stats.upcomingTasks.map((task) => (
-                <Link
-                  key={task.id}
-                  href={`/tasks/${task.id}`}
-                  className="flex items-center justify-between gap-4 py-3 text-sm first:pt-0 last:pb-0"
-                >
-                  <span className="font-medium">{task.title}</span>
-                  <span className="text-zinc-500">{formatDate(task.dueDate)}</span>
-                </Link>
-              ))}
-            </div>
-          ) : (
-            <EmptyState
-              title="No upcoming tasks"
-              description="Open tasks with due dates will appear here."
-            />
-          )}
-        </SectionCard>
+        {stats.permissions.canViewTasks ? (
+          <SectionCard title="Upcoming Tasks">
+            {stats.upcomingTasks.length > 0 ? (
+              <div className="divide-y">
+                {stats.upcomingTasks.map((task) => (
+                  <Link
+                    key={task.id}
+                    href={`/tasks/${task.id}`}
+                    className="flex items-center justify-between gap-4 py-3 text-sm first:pt-0 last:pb-0"
+                  >
+                    <span className="font-medium">{task.title}</span>
+                    <span className="text-zinc-500">
+                      {formatDate(task.dueDate)}
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <EmptyState
+                title="No upcoming tasks"
+                description="Open tasks with due dates will appear here."
+              />
+            )}
+          </SectionCard>
+        ) : null}
 
-        <SectionCard title="Recent Projects">
+        {stats.permissions.canViewProjects ? (
+          <SectionCard title="Recent Projects">
           {stats.recentProjects.length > 0 ? (
             <div className="divide-y">
               {stats.recentProjects.map((project) => (
@@ -118,9 +140,11 @@ export default async function DashboardPage() {
               description="Projects will appear here after they are created."
             />
           )}
-        </SectionCard>
+          </SectionCard>
+        ) : null}
 
-        <SectionCard title="Recent Leads">
+        {stats.permissions.canViewLeads ? (
+          <SectionCard title="Recent Leads">
           {stats.recentLeads.length > 0 ? (
             <div className="divide-y">
               {stats.recentLeads.map((lead) => (
@@ -148,7 +172,8 @@ export default async function DashboardPage() {
               description="Leads will appear here after they are created."
             />
           )}
-        </SectionCard>
+          </SectionCard>
+        ) : null}
       </div>
     </>
   );

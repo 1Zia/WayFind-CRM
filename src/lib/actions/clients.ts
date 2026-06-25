@@ -74,6 +74,7 @@ export async function createClient(input: ClientInput) {
 
   revalidatePath("/clients");
   revalidatePath("/dashboard");
+  revalidatePath("/reports");
 
   return {
     success: true,
@@ -112,6 +113,7 @@ export async function updateClient(id: string, input: ClientInput) {
   revalidatePath("/clients");
   revalidatePath(`/clients/${clientId}`);
   revalidatePath("/dashboard");
+  revalidatePath("/reports");
 
   return {
     success: true,
@@ -143,6 +145,7 @@ export async function deleteClient(id: string) {
 
   revalidatePath("/clients");
   revalidatePath("/dashboard");
+  revalidatePath("/reports");
 
   return {
     success: true,

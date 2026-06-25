@@ -14,9 +14,13 @@ import {
   tasks,
 } from "@/db/schema";
 import { requireUser } from "@/lib/auth";
-import { requirePermission } from "@/lib/permissions";
+import { hasPermission, requirePermission } from "@/lib/permissions";
 
-async function getDashboardFinanceTotals() {
+async function getDashboardFinanceTotals(enabled: boolean) {
+  if (!enabled) {
+    return { revenue: 0, expenses: 0, profitLoss: 0 };
+  }
+
   try {
     const [incomeRows, expenseRows] = await Promise.all([
       db.select().from(income),
@@ -38,10 +42,48 @@ async function getDashboardFinanceTotals() {
   }
 }
 
-async function getDashboardLeadCount() {
+async function getCount(enabled: boolean, table: typeof clients | typeof leads) {
+  if (!enabled) {
+    return 0;
+  }
+
   try {
-    const [leadsCount] = await db.select({ count: count() }).from(leads);
-    return leadsCount.count;
+    const [result] = await db.select({ count: count() }).from(table);
+    return result.count;
+  } catch {
+    return 0;
+  }
+}
+
+async function getActiveProjectsCount(enabled: boolean) {
+  if (!enabled) {
+    return 0;
+  }
+
+  try {
+    const [result] = await db
+      .select({ count: count() })
+      .from(projects)
+      .where(eq(projects.status, "active"));
+
+    return result.count;
+  } catch {
+    return 0;
+  }
+}
+
+async function getPendingTasksCount(userId: string, canViewAllTasks: boolean) {
+  try {
+    const [result] = await db
+      .select({ count: count() })
+      .from(tasks)
+      .where(
+        canViewAllTasks
+          ? eq(tasks.status, "todo")
+          : and(eq(tasks.status, "todo"), eq(tasks.assignedTo, userId)),
+      );
+
+    return result.count;
   } catch {
     return 0;
   }
@@ -62,7 +104,11 @@ async function getUnreadNotificationCount(userId: string) {
   }
 }
 
-async function getRecentActivity() {
+async function getRecentActivity(enabled: boolean) {
+  if (!enabled) {
+    return [];
+  }
+
   try {
     return db
       .select({
@@ -80,9 +126,9 @@ async function getRecentActivity() {
   }
 }
 
-async function getUpcomingTasks(userId: string, isEmployee: boolean) {
+async function getUpcomingTasks(userId: string, canViewAllTasks: boolean) {
   try {
-    const query = db
+    return db
       .select({
         id: tasks.id,
         title: tasks.title,
@@ -91,20 +137,22 @@ async function getUpcomingTasks(userId: string, isEmployee: boolean) {
       })
       .from(tasks)
       .where(
-        isEmployee
-          ? and(eq(tasks.assignedTo, userId), ne(tasks.status, "done"))
-          : ne(tasks.status, "done"),
+        canViewAllTasks
+          ? ne(tasks.status, "done")
+          : and(eq(tasks.assignedTo, userId), ne(tasks.status, "done")),
       )
       .orderBy(desc(tasks.dueDate))
       .limit(5);
-
-    return query;
   } catch {
     return [];
   }
 }
 
-async function getRecentProjects() {
+async function getRecentProjects(enabled: boolean) {
+  if (!enabled) {
+    return [];
+  }
+
   try {
     return db
       .select({
@@ -122,7 +170,11 @@ async function getRecentProjects() {
   }
 }
 
-async function getRecentLeads() {
+async function getRecentLeads(enabled: boolean) {
+  if (!enabled) {
+    return [];
+  }
+
   try {
     return db
       .select({
@@ -145,41 +197,52 @@ export async function getDashboardStats() {
   const user = await requireUser();
   requirePermission(user, "dashboard:view");
 
-  const [clientsCount] = await db.select({ count: count() }).from(clients);
-
-  const [activeProjectsCount] = await db
-    .select({ count: count() })
-    .from(projects)
-    .where(eq(projects.status, "active"));
-
-  const [pendingTasksCount] = await db
-    .select({ count: count() })
-    .from(tasks)
-    .where(eq(tasks.status, "todo"));
+  const canViewClients = hasPermission(user, "clients:view");
+  const canViewLeads = hasPermission(user, "leads:view");
+  const canViewProjects = hasPermission(user, "projects:view");
+  const canViewAllTasks = hasPermission(user, "tasks:view");
+  const canViewTasks =
+    canViewAllTasks || hasPermission(user, "tasks:view_assigned");
+  const canViewFinance = hasPermission(user, "finance:view");
+  const canViewAuditLogs = user.role === "super_admin";
 
   const [
-    financeTotals,
+    totalClients,
     totalLeads,
+    activeProjects,
+    pendingTasks,
+    financeTotals,
     unreadNotifications,
     recentActivity,
     upcomingTasks,
     recentProjects,
     recentLeads,
   ] = await Promise.all([
-    getDashboardFinanceTotals(),
-    getDashboardLeadCount(),
+    getCount(canViewClients, clients),
+    getCount(canViewLeads, leads),
+    getActiveProjectsCount(canViewProjects),
+    canViewTasks ? getPendingTasksCount(user.id, canViewAllTasks) : 0,
+    getDashboardFinanceTotals(canViewFinance),
     getUnreadNotificationCount(user.id),
-    getRecentActivity(),
-    getUpcomingTasks(user.id, user.role === "employee"),
-    getRecentProjects(),
-    getRecentLeads(),
+    getRecentActivity(canViewAuditLogs),
+    canViewTasks ? getUpcomingTasks(user.id, canViewAllTasks) : [],
+    getRecentProjects(canViewProjects),
+    getRecentLeads(canViewLeads),
   ]);
 
   return {
-    totalClients: clientsCount.count,
+    permissions: {
+      canViewClients,
+      canViewLeads,
+      canViewProjects,
+      canViewTasks,
+      canViewFinance,
+      canViewAuditLogs,
+    },
+    totalClients,
     totalLeads,
-    activeProjects: activeProjectsCount.count,
-    pendingTasks: pendingTasksCount.count,
+    activeProjects,
+    pendingTasks,
     revenue: financeTotals.revenue,
     expenses: financeTotals.expenses,
     profitLoss: financeTotals.profitLoss,

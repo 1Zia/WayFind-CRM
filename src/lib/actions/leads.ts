@@ -25,6 +25,7 @@ function nullable(value?: string) {
 function revalidateLeadPaths(id?: string) {
   revalidatePath("/leads");
   revalidatePath("/dashboard");
+  revalidatePath("/reports");
 
   if (id) {
     revalidatePath(`/leads/${id}`);

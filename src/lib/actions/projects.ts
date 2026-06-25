@@ -69,6 +69,7 @@ export async function createProject(input: ProjectInput) {
 
   revalidatePath("/projects");
   revalidatePath("/dashboard");
+  revalidatePath("/reports");
 
   return {
     success: true,
@@ -114,6 +115,7 @@ export async function updateProject(id: string, input: ProjectInput) {
   revalidatePath("/projects");
   revalidatePath(`/projects/${projectId}`);
   revalidatePath("/dashboard");
+  revalidatePath("/reports");
 
   return {
     success: true,
