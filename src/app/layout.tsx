@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "sonner";
+import { env } from "@/lib/env";
 import "./globals.css";
-
-const clerkPublishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
 export const metadata: Metadata = {
   title: "WayFind",
@@ -15,22 +14,14 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const content = (
+  return (
+    <ClerkProvider publishableKey={env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}>
     <html lang="en">
       <body>
         {children}
         <Toaster richColors position="top-right" />
       </body>
     </html>
-  );
-
-  if (!clerkPublishableKey) {
-    return content;
-  }
-
-  return (
-    <ClerkProvider>
-      {content}
     </ClerkProvider>
   );
 }
