@@ -3,30 +3,16 @@ import { FinanceReport } from "@/components/reports/finance-report";
 import { LeadReport } from "@/components/reports/lead-report";
 import { ProjectReport } from "@/components/reports/project-report";
 import { TaskReport } from "@/components/reports/task-report";
-import {
-  getBusinessOverviewReport,
-  getFinanceReport,
-  getLeadReport,
-  getProjectReport,
-  getTaskReport,
-} from "@/lib/actions/reports";
+import { getReportsPageData } from "@/lib/actions/reports";
 
 export default async function ReportsPage() {
   let reports;
 
   try {
-    reports = await Promise.all([
-      getBusinessOverviewReport(),
-      getFinanceReport(),
-      getProjectReport(),
-      getTaskReport(),
-      getLeadReport(),
-    ]);
+    reports = await getReportsPageData();
   } catch {
     return <ForbiddenMessage />;
   }
-
-  const [overview, finance, project, task, lead] = reports;
 
   return (
     <>
@@ -39,11 +25,11 @@ export default async function ReportsPage() {
       </div>
 
       <div className="space-y-8">
-        <BusinessOverviewReport report={overview} />
-        <FinanceReport report={finance} />
-        <ProjectReport report={project} />
-        <TaskReport report={task} />
-        <LeadReport report={lead} />
+        <BusinessOverviewReport report={reports.overview} />
+        <FinanceReport report={reports.finance} />
+        <ProjectReport report={reports.project} />
+        <TaskReport report={reports.task} />
+        <LeadReport report={reports.lead} />
       </div>
     </>
   );

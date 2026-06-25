@@ -17,6 +17,7 @@ import {
 } from "@/lib/validations/lead";
 
 const idSchema = z.string().uuid();
+const DEFAULT_LIST_LIMIT = 50;
 
 function nullable(value?: string) {
   return value || null;
@@ -77,10 +78,13 @@ export async function getLeads(filters?: { search?: string; status?: string }) {
   }
 
   if (where) {
-    return query.where(where).orderBy(desc(leads.createdAt));
+    return query
+      .where(where)
+      .orderBy(desc(leads.createdAt))
+      .limit(DEFAULT_LIST_LIMIT);
   }
 
-  return query.orderBy(desc(leads.createdAt));
+  return query.orderBy(desc(leads.createdAt)).limit(DEFAULT_LIST_LIMIT);
 }
 
 export async function getLeadById(id: string) {

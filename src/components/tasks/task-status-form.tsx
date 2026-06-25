@@ -18,12 +18,11 @@ export function TaskStatusForm({ taskId, status }: TaskStatusFormProps) {
   const [nextStatus, setNextStatus] = useState<TaskStatus>(status);
   const [loading, setLoading] = useState(false);
 
-  async function handleSubmit(event: React.FormEvent) {
-    event.preventDefault();
-
+  async function updateStatus(status: TaskStatus) {
     try {
       setLoading(true);
-      await updateTaskStatus(taskId, nextStatus);
+      setNextStatus(status);
+      await updateTaskStatus(taskId, status);
       toast.success("Task status updated");
       router.refresh();
     } catch (error) {
@@ -35,28 +34,62 @@ export function TaskStatusForm({ taskId, status }: TaskStatusFormProps) {
     }
   }
 
+  async function handleSubmit(event: React.FormEvent) {
+    event.preventDefault();
+    await updateStatus(nextStatus);
+  }
+
   return (
-    <form onSubmit={handleSubmit} className="mt-6 flex items-end gap-3">
-      <div>
-        <label className="text-sm font-medium">Status</label>
-        <select
-          value={nextStatus}
-          onChange={(event) => setNextStatus(event.target.value as TaskStatus)}
-          className="mt-1 block rounded-lg border px-3 py-2 text-sm"
+    <div className="mt-6 space-y-3">
+      <div className="flex flex-wrap gap-2">
+        <button
+          type="button"
+          disabled={loading || status === "in_progress"}
+          onClick={() => updateStatus("in_progress")}
+          className="rounded-lg border px-3 py-2 text-sm font-medium hover:bg-zinc-50 disabled:opacity-50"
         >
-          <option value="todo">Todo</option>
-          <option value="in_progress">In Progress</option>
-          <option value="testing">Testing</option>
-          <option value="done">Done</option>
-        </select>
+          Start Task
+        </button>
+        <button
+          type="button"
+          disabled={loading || status === "testing"}
+          onClick={() => updateStatus("testing")}
+          className="rounded-lg border px-3 py-2 text-sm font-medium hover:bg-zinc-50 disabled:opacity-50"
+        >
+          Send to Testing
+        </button>
+        <button
+          type="button"
+          disabled={loading || status === "done"}
+          onClick={() => updateStatus("done")}
+          className="rounded-lg border px-3 py-2 text-sm font-medium hover:bg-zinc-50 disabled:opacity-50"
+        >
+          Mark Done
+        </button>
       </div>
 
-      <button
-        disabled={loading}
-        className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-60"
-      >
-        {loading ? "Updating..." : "Update Status"}
-      </button>
-    </form>
+      <form onSubmit={handleSubmit} className="flex items-end gap-3">
+        <div>
+          <label className="text-sm font-medium">Status</label>
+          <select
+            value={nextStatus}
+            onChange={(event) => setNextStatus(event.target.value as TaskStatus)}
+            className="mt-1 block rounded-lg border px-3 py-2 text-sm"
+          >
+            <option value="todo">Todo</option>
+            <option value="in_progress">In Progress</option>
+            <option value="testing">Testing</option>
+            <option value="done">Done</option>
+          </select>
+        </div>
+
+        <button
+          disabled={loading}
+          className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-60"
+        >
+          {loading ? "Updating..." : "Update Status"}
+        </button>
+      </form>
+    </div>
   );
 }

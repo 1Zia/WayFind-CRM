@@ -1,5 +1,6 @@
 import {
   date,
+  index,
   pgEnum,
   pgTable,
   text,
@@ -36,4 +37,9 @@ export const tasks = pgTable("tasks", {
   createdBy: uuid("created_by").references(() => users.id),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
+}, (table) => ({
+  statusIdx: index("tasks_status_idx").on(table.status),
+  assignedToIdx: index("tasks_assigned_to_idx").on(table.assignedTo),
+  projectIdIdx: index("tasks_project_id_idx").on(table.projectId),
+  dueDateIdx: index("tasks_due_date_idx").on(table.dueDate),
+}));

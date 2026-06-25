@@ -7,6 +7,7 @@ type AuditLog = {
   userEmail: string | null;
   action: string;
   entityType: string;
+  entityId: string | null;
   description: string;
   createdAt: Date;
 };
@@ -14,6 +15,24 @@ type AuditLog = {
 type AuditLogTableProps = {
   logs: AuditLog[];
 };
+
+function getEntityHref(entityType: string, entityId: string | null) {
+  if (!entityId) {
+    return null;
+  }
+
+  const routes: Record<string, string> = {
+    client: `/clients/${entityId}`,
+    document: `/documents/${entityId}`,
+    lead: `/leads/${entityId}`,
+    notification: `/notifications/${entityId}`,
+    project: `/projects/${entityId}`,
+    task: `/tasks/${entityId}`,
+    user: `/team/users/${entityId}`,
+  };
+
+  return routes[entityType] ?? null;
+}
 
 export function AuditLogTable({ logs }: AuditLogTableProps) {
   return (
@@ -31,30 +50,45 @@ export function AuditLogTable({ logs }: AuditLogTableProps) {
         </thead>
 
         <tbody>
-          {logs.map((log) => (
-            <tr key={log.id} className="border-b last:border-0">
-              <td className="px-4 py-3">
-                <div className="font-medium">
-                  {log.userName ?? log.userId ?? "System"}
-                </div>
-                {log.userEmail ? (
-                  <div className="text-xs text-zinc-500">{log.userEmail}</div>
-                ) : null}
-              </td>
-              <td className="px-4 py-3">{log.action}</td>
-              <td className="px-4 py-3">{log.entityType}</td>
-              <td className="px-4 py-3">{log.description}</td>
-              <td className="px-4 py-3">{log.createdAt.toLocaleString()}</td>
-              <td className="px-4 py-3">
-                <Link
-                  href={`/audit-logs/${log.id}`}
-                  className="text-purple-600 hover:underline"
-                >
-                  View
-                </Link>
-              </td>
-            </tr>
-          ))}
+          {logs.map((log) => {
+            const entityHref = getEntityHref(log.entityType, log.entityId);
+
+            return (
+              <tr key={log.id} className="border-b last:border-0">
+                <td className="px-4 py-3">
+                  <div className="font-medium">
+                    {log.userName ?? log.userId ?? "System"}
+                  </div>
+                  {log.userEmail ? (
+                    <div className="text-xs text-zinc-500">{log.userEmail}</div>
+                  ) : null}
+                </td>
+                <td className="px-4 py-3">{log.action}</td>
+                <td className="px-4 py-3">
+                  {entityHref ? (
+                    <Link
+                      href={entityHref}
+                      className="text-purple-600 hover:underline"
+                    >
+                      {log.entityType}
+                    </Link>
+                  ) : (
+                    log.entityType
+                  )}
+                </td>
+                <td className="px-4 py-3">{log.description}</td>
+                <td className="px-4 py-3">{log.createdAt.toLocaleString()}</td>
+                <td className="px-4 py-3">
+                  <Link
+                    href={`/audit-logs/${log.id}`}
+                    className="text-purple-600 hover:underline"
+                  >
+                    View
+                  </Link>
+                </td>
+              </tr>
+            );
+          })}
 
           {logs.length === 0 && (
             <tr>

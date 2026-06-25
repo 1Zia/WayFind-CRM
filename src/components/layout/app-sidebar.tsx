@@ -1,11 +1,12 @@
 import Link from "next/link";
+import type { users } from "@/db/schema";
 
 import { navigationItems } from "@/config/navigation";
-import { requireUser } from "@/lib/auth";
 import { canAccessRoute } from "@/lib/permissions";
 
-export async function AppSidebar() {
-  const user = await requireUser();
+type User = typeof users.$inferSelect;
+
+export function AppSidebar({ user }: { user: User }) {
   const visibleItems = navigationItems.filter((item) =>
     canAccessRoute(user, item.href),
   );

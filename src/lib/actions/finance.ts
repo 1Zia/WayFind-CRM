@@ -19,6 +19,7 @@ import {
 } from "@/lib/validations/finance";
 
 const idSchema = z.string().uuid();
+const DEFAULT_LIST_LIMIT = 50;
 
 function revalidateFinancePaths(id?: string) {
   revalidatePath("/finance");
@@ -198,7 +199,11 @@ export async function getFinanceReports() {
 export async function getIncome() {
   await requireFinance("finance:view");
 
-  return db.select().from(income).orderBy(desc(income.paymentDate));
+  return db
+    .select()
+    .from(income)
+    .orderBy(desc(income.paymentDate))
+    .limit(DEFAULT_LIST_LIMIT);
 }
 
 export async function createIncome(input: IncomeInput) {
@@ -276,7 +281,11 @@ export async function updateIncome(id: string, input: IncomeInput) {
 export async function getExpenses() {
   await requireFinance("finance:view");
 
-  return db.select().from(expenses).orderBy(desc(expenses.date));
+  return db
+    .select()
+    .from(expenses)
+    .orderBy(desc(expenses.date))
+    .limit(DEFAULT_LIST_LIMIT);
 }
 
 export async function createExpense(input: ExpenseInput) {
@@ -354,7 +363,11 @@ export async function updateExpense(id: string, input: ExpenseInput) {
 export async function getInvoices() {
   await requireFinance("finance:view");
 
-  return db.select().from(invoices).orderBy(desc(invoices.issueDate));
+  return db
+    .select()
+    .from(invoices)
+    .orderBy(desc(invoices.issueDate))
+    .limit(DEFAULT_LIST_LIMIT);
 }
 
 export async function createInvoice(input: InvoiceInput) {

@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 type InvoiceRow = {
   id: string;
   clientId: string | null;
@@ -60,14 +62,28 @@ export function InvoiceTable({
                 {invoice.invoiceNumber}
               </td>
               <td className="px-4 py-3">
-                {invoice.clientId
-                  ? clientNames.get(invoice.clientId) ?? invoice.clientId
-                  : "-"}
+                {invoice.clientId ? (
+                  <Link
+                    href={`/clients/${invoice.clientId}`}
+                    className="text-purple-600 hover:underline"
+                  >
+                    {clientNames.get(invoice.clientId) ?? invoice.clientId}
+                  </Link>
+                ) : (
+                  "-"
+                )}
               </td>
               <td className="px-4 py-3">
-                {invoice.projectId
-                  ? projectNames.get(invoice.projectId) ?? invoice.projectId
-                  : "-"}
+                {invoice.projectId ? (
+                  <Link
+                    href={`/projects/${invoice.projectId}`}
+                    className="text-purple-600 hover:underline"
+                  >
+                    {projectNames.get(invoice.projectId) ?? invoice.projectId}
+                  </Link>
+                ) : (
+                  "-"
+                )}
               </td>
               <td className="px-4 py-3">{formatMoney(invoice.amount)}</td>
               <td className="px-4 py-3 capitalize">{invoice.status}</td>

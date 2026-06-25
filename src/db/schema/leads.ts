@@ -1,4 +1,4 @@
-import { pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { index, pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 
 import { users } from "./users";
 
@@ -24,4 +24,8 @@ export const leads = pgTable("leads", {
   createdBy: uuid("created_by").references(() => users.id),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
+}, (table) => ({
+  statusIdx: index("leads_status_idx").on(table.status),
+  createdAtIdx: index("leads_created_at_idx").on(table.createdAt),
+  followUpDateIdx: index("leads_follow_up_date_idx").on(table.followUpDate),
+}));

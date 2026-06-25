@@ -1,5 +1,7 @@
 "use server";
 
+import { count } from "drizzle-orm";
+
 import { db } from "@/db";
 import {
   clients,
@@ -45,25 +47,36 @@ function countValues<T extends string>(values: T[]) {
   }, {} as Record<T, number>);
 }
 
-async function getReportUser() {
+async function getReportRole() {
   const user = await requireUser();
-  return {
-    ...user,
-    role: requireReportRole(user.role),
-  };
+  return requireReportRole(user.role);
 }
 
-export async function getFinanceReport() {
-  const user = await getReportUser();
-
-  if (!canViewFinance(user.role)) {
+async function buildFinanceReport(role: ReportRole) {
+  if (!canViewFinance(role)) {
     return null;
   }
 
   const [incomeRows, expenseRows, invoiceRows] = await Promise.all([
-    db.select().from(income),
-    db.select().from(expenses),
-    db.select().from(invoices),
+    db
+      .select({
+        amount: income.amount,
+        paymentDate: income.paymentDate,
+        status: income.status,
+      })
+      .from(income),
+    db
+      .select({
+        amount: expenses.amount,
+        date: expenses.date,
+      })
+      .from(expenses),
+    db
+      .select({
+        amount: invoices.amount,
+        status: invoices.status,
+      })
+      .from(invoices),
   ]);
 
   const totalIncome = sumByAmount(incomeRows);
@@ -109,14 +122,17 @@ export async function getFinanceReport() {
   };
 }
 
-export async function getProjectReport() {
-  const user = await getReportUser();
-
-  if (!canViewOperations(user.role)) {
+async function buildProjectReport(role: ReportRole) {
+  if (!canViewOperations(role)) {
     return null;
   }
 
-  const projectRows = await db.select().from(projects);
+  const projectRows = await db
+    .select({
+      budget: projects.budget,
+      status: projects.status,
+    })
+    .from(projects);
   const projectsByStatus = countValues(
     projectRows.map((project) => project.status),
   );
@@ -134,14 +150,18 @@ export async function getProjectReport() {
   };
 }
 
-export async function getTaskReport() {
-  const user = await getReportUser();
-
-  if (!canViewOperations(user.role)) {
+async function buildTaskReport(role: ReportRole) {
+  if (!canViewOperations(role)) {
     return null;
   }
 
-  const taskRows = await db.select().from(tasks);
+  const taskRows = await db
+    .select({
+      dueDate: tasks.dueDate,
+      priority: tasks.priority,
+      status: tasks.status,
+    })
+    .from(tasks);
   const tasksByStatus = countValues(taskRows.map((task) => task.status));
   const tasksByPriority = countValues(taskRows.map((task) => task.priority));
   const today = new Date().toISOString().slice(0, 10);
@@ -158,14 +178,20 @@ export async function getTaskReport() {
   };
 }
 
-export async function getLeadReport() {
-  const user = await getReportUser();
-
-  if (!canViewOperations(user.role)) {
+async function buildLeadReport(role: ReportRole) {
+  if (!canViewOperations(role)) {
     return null;
   }
 
-  const leadRows = await db.select().from(leads);
+  const leadRows = await db
+    .select({
+      id: leads.id,
+      leadName: leads.leadName,
+      company: leads.company,
+      followUpDate: leads.followUpDate,
+      status: leads.status,
+    })
+    .from(leads);
   const leadsByStatus = countValues(leadRows.map((lead) => lead.status));
   const today = new Date().toISOString().slice(0, 10);
   const upcomingFollowUps = leadRows
@@ -184,19 +210,21 @@ export async function getLeadReport() {
   };
 }
 
-export async function getBusinessOverviewReport() {
-  const user = await getReportUser();
-  const [clientRows, leadReport, projectReport, taskReport, financeReport] =
-    await Promise.all([
-      db.select().from(clients),
-      canViewOperations(user.role) ? getLeadReport() : null,
-      canViewOperations(user.role) ? getProjectReport() : null,
-      canViewOperations(user.role) ? getTaskReport() : null,
-      canViewFinance(user.role) ? getFinanceReport() : null,
-    ]);
-
+function buildBusinessOverviewReport({
+  clientCount,
+  financeReport,
+  leadReport,
+  projectReport,
+  taskReport,
+}: {
+  clientCount: number;
+  financeReport: Awaited<ReturnType<typeof buildFinanceReport>>;
+  leadReport: Awaited<ReturnType<typeof buildLeadReport>>;
+  projectReport: Awaited<ReturnType<typeof buildProjectReport>>;
+  taskReport: Awaited<ReturnType<typeof buildTaskReport>>;
+}) {
   return {
-    totalClients: clientRows.length,
+    totalClients: clientCount,
     totalLeads: leadReport?.totalLeads ?? 0,
     convertedLeads: leadReport?.convertedLeads ?? 0,
     activeProjects: projectReport?.activeProjects ?? 0,
@@ -209,5 +237,68 @@ export async function getBusinessOverviewReport() {
     totalIncome: financeReport?.paidIncomeTotal ?? 0,
     totalExpenses: financeReport?.totalExpenses ?? 0,
     profitLoss: financeReport?.profitLoss ?? 0,
+  };
+}
+
+export async function getFinanceReport() {
+  return buildFinanceReport(await getReportRole());
+}
+
+export async function getProjectReport() {
+  return buildProjectReport(await getReportRole());
+}
+
+export async function getTaskReport() {
+  return buildTaskReport(await getReportRole());
+}
+
+export async function getLeadReport() {
+  return buildLeadReport(await getReportRole());
+}
+
+export async function getBusinessOverviewReport() {
+  const role = await getReportRole();
+  const [clientCountResult, financeReport, projectReport, taskReport, leadReport] =
+    await Promise.all([
+      db.select({ count: count() }).from(clients),
+      buildFinanceReport(role),
+      buildProjectReport(role),
+      buildTaskReport(role),
+      buildLeadReport(role),
+    ]);
+
+  return buildBusinessOverviewReport({
+    clientCount: clientCountResult[0]?.count ?? 0,
+    financeReport,
+    leadReport,
+    projectReport,
+    taskReport,
+  });
+}
+
+export async function getReportsPageData() {
+  const role = await getReportRole();
+  const [clientCountResult, financeReport, projectReport, taskReport, leadReport] =
+    await Promise.all([
+      db.select({ count: count() }).from(clients),
+      buildFinanceReport(role),
+      buildProjectReport(role),
+      buildTaskReport(role),
+      buildLeadReport(role),
+    ]);
+  const overview = buildBusinessOverviewReport({
+    clientCount: clientCountResult[0]?.count ?? 0,
+    financeReport,
+    leadReport,
+    projectReport,
+    taskReport,
+  });
+
+  return {
+    overview,
+    finance: financeReport,
+    project: projectReport,
+    task: taskReport,
+    lead: leadReport,
   };
 }

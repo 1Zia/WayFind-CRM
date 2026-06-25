@@ -5,20 +5,25 @@ import { z } from "zod";
 import { desc, eq } from "drizzle-orm";
 
 import { db } from "@/db";
-import { projects } from "@/db/schema";
+import { documents, projects, tasks } from "@/db/schema";
 import { requireUser } from "@/lib/auth";
-import { requirePermission } from "@/lib/permissions";
+import { hasPermission, requirePermission } from "@/lib/permissions";
 import { createAuditLog } from "@/lib/audit";
 import { projectSchema, type ProjectInput } from "@/lib/validations/project";
 
 const idSchema = z.string().uuid();
+const DEFAULT_LIST_LIMIT = 50;
 
 export async function getProjects() {
   const user = await requireUser();
 
   requirePermission(user, "projects:view");
 
-  return db.select().from(projects).orderBy(desc(projects.createdAt));
+  return db
+    .select()
+    .from(projects)
+    .orderBy(desc(projects.createdAt))
+    .limit(DEFAULT_LIST_LIMIT);
 }
 
 export async function getProjectById(id: string) {
@@ -36,6 +41,58 @@ export async function getProjectById(id: string) {
   }
 
   return project;
+}
+
+export async function getProjectRelatedRecords(id: string) {
+  const user = await requireUser();
+  requirePermission(user, "projects:view");
+  const projectId = idSchema.parse(id);
+  const canViewDocuments = hasPermission(user, "documents:view");
+
+  const [taskRows, taskStatusRows, documentRows] = await Promise.all([
+    db
+      .select({
+        id: tasks.id,
+        title: tasks.title,
+        priority: tasks.priority,
+        status: tasks.status,
+        dueDate: tasks.dueDate,
+      })
+      .from(tasks)
+      .where(eq(tasks.projectId, projectId))
+      .orderBy(desc(tasks.createdAt))
+      .limit(5),
+    db
+      .select({ status: tasks.status })
+      .from(tasks)
+      .where(eq(tasks.projectId, projectId)),
+    canViewDocuments
+      ? db
+          .select({
+            id: documents.id,
+            fileName: documents.fileName,
+            fileType: documents.fileType,
+            createdAt: documents.createdAt,
+          })
+          .from(documents)
+          .where(eq(documents.projectId, projectId))
+          .orderBy(desc(documents.createdAt))
+          .limit(5)
+      : [],
+  ]);
+
+  return {
+    tasks: taskRows,
+    documents: documentRows,
+    completedTasks: taskStatusRows.filter((task) => task.status === "done")
+      .length,
+    totalTasks: taskStatusRows.length,
+    permissions: {
+      canCreateTask: hasPermission(user, "tasks:create"),
+      canCreateDocument: hasPermission(user, "documents:create"),
+      canUpdateProject: hasPermission(user, "projects:update"),
+    },
+  };
 }
 
 export async function createProject(input: ProjectInput) {

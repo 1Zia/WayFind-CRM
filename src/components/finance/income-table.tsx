@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 type IncomeRow = {
   id: string;
   clientId: string | null;
@@ -55,12 +57,28 @@ export function IncomeTable({
           {income.map((item) => (
             <tr key={item.id} className="border-b last:border-0">
               <td className="px-4 py-3">
-                {item.clientId ? clientNames.get(item.clientId) ?? item.clientId : "-"}
+                {item.clientId ? (
+                  <Link
+                    href={`/clients/${item.clientId}`}
+                    className="text-purple-600 hover:underline"
+                  >
+                    {clientNames.get(item.clientId) ?? item.clientId}
+                  </Link>
+                ) : (
+                  "-"
+                )}
               </td>
               <td className="px-4 py-3">
-                {item.projectId
-                  ? projectNames.get(item.projectId) ?? item.projectId
-                  : "-"}
+                {item.projectId ? (
+                  <Link
+                    href={`/projects/${item.projectId}`}
+                    className="text-purple-600 hover:underline"
+                  >
+                    {projectNames.get(item.projectId) ?? item.projectId}
+                  </Link>
+                ) : (
+                  "-"
+                )}
               </td>
               <td className="px-4 py-3">{formatMoney(item.amount)}</td>
               <td className="px-4 py-3">{item.paymentDate}</td>

@@ -15,6 +15,7 @@ import {
 } from "@/lib/validations/document";
 
 const idSchema = z.string().uuid();
+const DEFAULT_LIST_LIMIT = 50;
 
 function nullable(value?: string) {
   return value || null;
@@ -63,7 +64,11 @@ export async function getDocuments() {
   const user = await requireUser();
   requirePermission(user, "documents:view");
 
-  return db.select().from(documents).orderBy(desc(documents.createdAt));
+  return db
+    .select()
+    .from(documents)
+    .orderBy(desc(documents.createdAt))
+    .limit(DEFAULT_LIST_LIMIT);
 }
 
 export async function getDocumentById(id: string) {

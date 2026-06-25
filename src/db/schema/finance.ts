@@ -1,5 +1,6 @@
 import {
   date,
+  index,
   integer,
   pgEnum,
   pgTable,
@@ -48,7 +49,10 @@ export const income = pgTable("income", {
   createdBy: uuid("created_by").references(() => users.id),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
+}, (table) => ({
+  statusIdx: index("income_status_idx").on(table.status),
+  paymentDateIdx: index("income_payment_date_idx").on(table.paymentDate),
+}));
 
 export const expenses = pgTable("expenses", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -61,7 +65,9 @@ export const expenses = pgTable("expenses", {
   createdBy: uuid("created_by").references(() => users.id),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
+}, (table) => ({
+  dateIdx: index("expenses_date_idx").on(table.date),
+}));
 
 export const invoices = pgTable("invoices", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -77,4 +83,6 @@ export const invoices = pgTable("invoices", {
   createdBy: uuid("created_by").references(() => users.id),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
+}, (table) => ({
+  statusIdx: index("invoices_status_idx").on(table.status),
+}));

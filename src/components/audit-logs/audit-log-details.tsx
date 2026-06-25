@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 type AuditLogDetailsProps = {
   log: {
     userId: string | null;
@@ -12,8 +14,27 @@ type AuditLogDetailsProps = {
   };
 };
 
+function getEntityHref(entityType: string, entityId: string | null) {
+  if (!entityId) {
+    return null;
+  }
+
+  const routes: Record<string, string> = {
+    client: `/clients/${entityId}`,
+    document: `/documents/${entityId}`,
+    lead: `/leads/${entityId}`,
+    notification: `/notifications/${entityId}`,
+    project: `/projects/${entityId}`,
+    task: `/tasks/${entityId}`,
+    user: `/team/users/${entityId}`,
+  };
+
+  return routes[entityType] ?? null;
+}
+
 export function AuditLogDetails({ log }: AuditLogDetailsProps) {
   const userLabel = log.userName ?? log.userEmail ?? log.userId ?? "System";
+  const entityHref = getEntityHref(log.entityType, log.entityId);
   const metadata =
     log.metadata === null || log.metadata === undefined
       ? "No metadata"
@@ -25,7 +46,21 @@ export function AuditLogDetails({ log }: AuditLogDetailsProps) {
         <Detail label="User" value={userLabel} />
         <Detail label="Action" value={log.action} />
         <Detail label="Entity Type" value={log.entityType} />
-        <Detail label="Entity ID" value={log.entityId ?? "-"} />
+        <div>
+          <p className="text-zinc-500">Entity ID</p>
+          {entityHref ? (
+            <Link
+              href={entityHref}
+              className="mt-1 block font-medium text-purple-600 hover:underline"
+            >
+              {log.entityId}
+            </Link>
+          ) : (
+            <div className="mt-1 font-medium text-zinc-950">
+              {log.entityId ?? "-"}
+            </div>
+          )}
+        </div>
         <Detail label="Created" value={log.createdAt.toLocaleString()} />
       </div>
 

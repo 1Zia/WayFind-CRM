@@ -1,9 +1,18 @@
 import { AppShell } from "@/components/layout/app-shell";
+import { getUnreadNotificationsCountForUser } from "@/lib/actions/notifications";
+import { requireUser } from "@/lib/auth";
 
-export default function ProtectedAppLayout({
+export default async function ProtectedAppLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <AppShell>{children}</AppShell>;
+  const user = await requireUser();
+  const unreadNotifications = await getUnreadNotificationsCountForUser(user.id);
+
+  return (
+    <AppShell unreadNotifications={unreadNotifications} user={user}>
+      {children}
+    </AppShell>
+  );
 }

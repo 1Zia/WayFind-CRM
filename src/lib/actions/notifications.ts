@@ -25,6 +25,7 @@ const notificationSchema = z.object({
 });
 
 export type NotificationInput = z.infer<typeof notificationSchema>;
+const DEFAULT_LIST_LIMIT = 50;
 
 function revalidateNotificationPaths(id?: string) {
   revalidatePath("/notifications");
@@ -41,16 +42,22 @@ export async function getNotifications() {
     .select()
     .from(notifications)
     .where(eq(notifications.userId, user.id))
-    .orderBy(desc(notifications.createdAt));
+    .orderBy(desc(notifications.createdAt))
+    .limit(DEFAULT_LIST_LIMIT);
 }
 
 export async function getUnreadNotificationsCount() {
   const user = await requireUser();
+  return getUnreadNotificationsCountForUser(user.id);
+}
 
+export async function getUnreadNotificationsCountForUser(userId: string) {
   const [result] = await db
     .select({ count: count() })
     .from(notifications)
-    .where(and(eq(notifications.userId, user.id), eq(notifications.isRead, false)));
+    .where(
+      and(eq(notifications.userId, userId), eq(notifications.isRead, false)),
+    );
 
   return result.count;
 }

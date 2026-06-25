@@ -1,10 +1,8 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 
+import { StatusBadge } from "@/components/shared/status-badge";
 import { TaskStatusForm } from "@/components/tasks/task-status-form";
-import {
-  getTaskById,
-  getTaskDisplayOptions,
-} from "@/lib/actions/tasks";
+import { getTaskById, getTaskDisplayOptions } from "@/lib/actions/tasks";
 
 export default async function TaskPage({
   params,
@@ -18,6 +16,10 @@ export default async function TaskPage({
 
   const project = options.projects.find((item) => item.id === task.projectId);
   const assignedUser = options.users.find((item) => item.id === task.assignedTo);
+  const isOverdue =
+    task.dueDate &&
+    task.status !== "done" &&
+    new Date(task.dueDate) < new Date(new Date().toDateString());
 
   return (
     <>
@@ -46,7 +48,16 @@ export default async function TaskPage({
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div>
             <p className="text-zinc-500">Project</p>
-            <div>{project?.name ?? task.projectId ?? "-"}</div>
+            {project ? (
+              <Link
+                href={`/projects/${project.id}`}
+                className="font-medium text-purple-600 hover:underline"
+              >
+                {project.name}
+              </Link>
+            ) : (
+              <div>{task.projectId ?? "-"}</div>
+            )}
           </div>
 
           <div>
@@ -56,18 +67,34 @@ export default async function TaskPage({
 
           <div>
             <p className="text-zinc-500">Priority</p>
-            <div className="capitalize">{task.priority}</div>
+            <div className="mt-1">
+              <StatusBadge
+                tone={
+                  task.priority === "urgent"
+                    ? "danger"
+                    : task.priority === "high"
+                      ? "warning"
+                      : "default"
+                }
+              >
+                {task.priority}
+              </StatusBadge>
+            </div>
           </div>
 
           <div>
             <p className="text-zinc-500">Due Date</p>
-            <div>{task.dueDate ?? "-"}</div>
+            <div className="mt-1 flex items-center gap-2">
+              <span>{task.dueDate ?? "-"}</span>
+              {isOverdue ? (
+                <StatusBadge tone="danger">overdue</StatusBadge>
+              ) : null}
+            </div>
           </div>
         </div>
 
         <TaskStatusForm status={task.status} taskId={task.id} />
       </div>
     </>
-  );}
-
-
+  );
+}

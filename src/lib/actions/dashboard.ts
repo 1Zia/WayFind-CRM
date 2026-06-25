@@ -205,6 +205,11 @@ export async function getDashboardStats() {
     canViewAllTasks || hasPermission(user, "tasks:view_assigned");
   const canViewFinance = hasPermission(user, "finance:view");
   const canViewAuditLogs = user.role === "super_admin";
+  const canCreateClient = hasPermission(user, "clients:create");
+  const canCreateLead = hasPermission(user, "leads:create");
+  const canCreateProject = hasPermission(user, "projects:create");
+  const canCreateTask = hasPermission(user, "tasks:create");
+  const canCreateFinance = hasPermission(user, "finance:create");
 
   const [
     totalClients,
@@ -238,6 +243,11 @@ export async function getDashboardStats() {
       canViewTasks,
       canViewFinance,
       canViewAuditLogs,
+      canCreateClient,
+      canCreateLead,
+      canCreateProject,
+      canCreateTask,
+      canCreateFinance,
     },
     totalClients,
     totalLeads,

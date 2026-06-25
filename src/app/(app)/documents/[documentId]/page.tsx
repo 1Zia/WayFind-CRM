@@ -41,8 +41,10 @@ export default async function DocumentPage({
       </div>
 
       <DocumentDetails
+        clientId={document.clientId}
         clientName={clientName}
         document={document}
+        projectId={document.projectId}
         projectName={projectName}
       />
     </>

@@ -27,6 +27,19 @@ function formatDate(value: Date | string | null) {
 
 export default async function DashboardPage() {
   const stats = await getDashboardStats();
+  const quickActions = [
+    stats.permissions.canCreateClient
+      ? { href: "/clients/new", label: "New Client" }
+      : null,
+    stats.permissions.canCreateLead ? { href: "/leads/new", label: "New Lead" } : null,
+    stats.permissions.canCreateProject
+      ? { href: "/projects/new", label: "New Project" }
+      : null,
+    stats.permissions.canCreateTask ? { href: "/tasks/new", label: "New Task" } : null,
+    stats.permissions.canCreateFinance
+      ? { href: "/finance/invoices", label: "New Invoice" }
+      : null,
+  ].filter(Boolean) as Array<{ href: string; label: string }>;
 
   return (
     <>
@@ -63,6 +76,27 @@ export default async function DashboardPage() {
           value={stats.unreadNotifications}
         />
       </div>
+
+      {quickActions.length > 0 ? (
+        <div className="mt-6">
+          <SectionCard
+            title="Quick Actions"
+            description="Jump straight into common CRM work."
+          >
+            <div className="flex flex-wrap gap-2">
+              {quickActions.map((action) => (
+                <Link
+                  key={action.href}
+                  href={action.href}
+                  className="rounded-lg border px-3 py-2 text-sm font-medium hover:bg-zinc-50"
+                >
+                  {action.label}
+                </Link>
+              ))}
+            </div>
+          </SectionCard>
+        </div>
+      ) : null}
 
       <div className="mt-6 grid gap-6 xl:grid-cols-2">
         {stats.permissions.canViewAuditLogs ? (

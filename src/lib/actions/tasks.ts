@@ -15,6 +15,7 @@ import { taskSchema, type TaskInput } from "@/lib/validations/task";
 const idSchema = z.string().uuid();
 const taskStatusSchema = z.enum(["todo", "in_progress", "testing", "done"]);
 const optionPermissionSchema = z.enum(["tasks:create", "tasks:update"]);
+const DEFAULT_LIST_LIMIT = 50;
 
 async function getTaskOptions() {
   const [projectOptions, userOptions] = await Promise.all([
@@ -74,12 +75,13 @@ export async function getTasks() {
       .select()
       .from(tasks)
       .where(eq(tasks.assignedTo, user.id))
-      .orderBy(desc(tasks.createdAt));
+      .orderBy(desc(tasks.createdAt))
+      .limit(DEFAULT_LIST_LIMIT);
   }
 
   requirePermission(user, "tasks:view");
 
-  return db.select().from(tasks).orderBy(desc(tasks.createdAt));
+  return db.select().from(tasks).orderBy(desc(tasks.createdAt)).limit(DEFAULT_LIST_LIMIT);
 }
 
 export async function getTaskById(id: string) {
@@ -207,6 +209,13 @@ export async function updateTask(id: string, input: TaskInput) {
 
   const taskId = idSchema.parse(id);
   const data = taskSchema.parse(input);
+  const existingTask = await db.query.tasks.findFirst({
+    where: eq(tasks.id, taskId),
+  });
+
+  if (!existingTask) {
+    throw new Error("Task not found");
+  }
 
   const [task] = await db
     .update(tasks)
@@ -223,10 +232,6 @@ export async function updateTask(id: string, input: TaskInput) {
     .where(eq(tasks.id, taskId))
     .returning();
 
-  if (!task) {
-    throw new Error("Task not found");
-  }
-
   await createAuditLog({
     userId: user.id,
     action: "update",
@@ -234,6 +239,17 @@ export async function updateTask(id: string, input: TaskInput) {
     entityId: task.id,
     description: `Updated task ${task.title}`,
   });
+
+  if (task.assignedTo && task.assignedTo !== existingTask.assignedTo) {
+    await createSystemNotification({
+      userId: task.assignedTo,
+      title: "New task assigned",
+      message: `You have been assigned a new task: ${task.title}`,
+      type: "task_assigned",
+    });
+
+    revalidatePath("/notifications");
+  }
 
   revalidatePath("/tasks");
   revalidatePath(`/tasks/${taskId}`);

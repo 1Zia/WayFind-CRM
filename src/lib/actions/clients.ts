@@ -5,13 +5,14 @@ import { z } from "zod";
 import { eq, ilike, or, desc } from "drizzle-orm";
 
 import { db } from "@/db";
-import { clients } from "@/db/schema";
+import { clients, documents, income, invoices, projects } from "@/db/schema";
 import { requireUser } from "@/lib/auth";
-import { requirePermission } from "@/lib/permissions";
+import { hasPermission, requirePermission } from "@/lib/permissions";
 import { createAuditLog } from "@/lib/audit";
 import { clientSchema, type ClientInput } from "@/lib/validations/client";
 
 const idSchema = z.string().uuid();
+const DEFAULT_LIST_LIMIT = 50;
 
 export async function getClients(search?: string) {
   const user = await requireUser();
@@ -28,10 +29,15 @@ export async function getClients(search?: string) {
           ilike(clients.phone, `%${search}%`),
         ),
       )
-      .orderBy(desc(clients.createdAt));
+      .orderBy(desc(clients.createdAt))
+      .limit(DEFAULT_LIST_LIMIT);
   }
 
-  return db.select().from(clients).orderBy(desc(clients.createdAt));
+  return db
+    .select()
+    .from(clients)
+    .orderBy(desc(clients.createdAt))
+    .limit(DEFAULT_LIST_LIMIT);
 }
 
 export async function getClientById(id: string) {
@@ -48,6 +54,81 @@ export async function getClientById(id: string) {
   }
 
   return client;
+}
+
+export async function getClientRelatedRecords(id: string) {
+  const user = await requireUser();
+  requirePermission(user, "clients:view");
+  const clientId = idSchema.parse(id);
+  const canViewFinance = hasPermission(user, "finance:view");
+
+  const [projectRows, documentRows, incomeRows, invoiceRows] =
+    await Promise.all([
+      db
+        .select({
+          id: projects.id,
+          name: projects.name,
+          status: projects.status,
+          deadline: projects.deadline,
+        })
+        .from(projects)
+        .where(eq(projects.clientId, clientId))
+        .orderBy(desc(projects.createdAt))
+        .limit(5),
+      db
+        .select({
+          id: documents.id,
+          fileName: documents.fileName,
+          fileType: documents.fileType,
+          createdAt: documents.createdAt,
+        })
+        .from(documents)
+        .where(eq(documents.clientId, clientId))
+        .orderBy(desc(documents.createdAt))
+        .limit(5),
+      canViewFinance
+        ? db
+            .select({
+              id: income.id,
+              amount: income.amount,
+              status: income.status,
+              paymentDate: income.paymentDate,
+            })
+            .from(income)
+            .where(eq(income.clientId, clientId))
+            .orderBy(desc(income.createdAt))
+            .limit(5)
+        : [],
+      canViewFinance
+        ? db
+            .select({
+              id: invoices.id,
+              invoiceNumber: invoices.invoiceNumber,
+              amount: invoices.amount,
+              status: invoices.status,
+              dueDate: invoices.dueDate,
+            })
+            .from(invoices)
+            .where(eq(invoices.clientId, clientId))
+            .orderBy(desc(invoices.createdAt))
+            .limit(5)
+        : [],
+    ]);
+
+  return {
+    projects: projectRows,
+    documents: documentRows,
+    income: incomeRows,
+    invoices: invoiceRows,
+    permissions: {
+      canCreateProject: hasPermission(user, "projects:create"),
+      canCreateDocument: hasPermission(user, "documents:create"),
+      canViewFinance,
+      canCreateInvoice: hasPermission(user, "finance:create"),
+      canUpdateClient: hasPermission(user, "clients:update"),
+      canDeleteClient: hasPermission(user, "clients:delete"),
+    },
+  };
 }
 
 export async function createClient(input: ClientInput) {
