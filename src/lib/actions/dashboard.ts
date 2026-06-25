@@ -7,6 +7,7 @@ import {
   clients,
   expenses as expenseRecords,
   income,
+  leads,
   projects,
   tasks,
 } from "@/db/schema";
@@ -35,6 +36,15 @@ async function getDashboardFinanceTotals() {
   }
 }
 
+async function getDashboardLeadCount() {
+  try {
+    const [leadsCount] = await db.select({ count: count() }).from(leads);
+    return leadsCount.count;
+  } catch {
+    return 0;
+  }
+}
+
 export async function getDashboardStats() {
   const user = await requireUser();
   requirePermission(user, "dashboard:view");
@@ -51,10 +61,14 @@ export async function getDashboardStats() {
     .from(tasks)
     .where(eq(tasks.status, "todo"));
 
-  const financeTotals = await getDashboardFinanceTotals();
+  const [financeTotals, totalLeads] = await Promise.all([
+    getDashboardFinanceTotals(),
+    getDashboardLeadCount(),
+  ]);
 
   return {
     totalClients: clientsCount.count,
+    totalLeads,
     activeProjects: activeProjectsCount.count,
     pendingTasks: pendingTasksCount.count,
     revenue: financeTotals.revenue,

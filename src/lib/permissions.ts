@@ -19,6 +19,9 @@ const permissions = {
     "clients:view",
     "clients:create",
     "clients:update",
+    "leads:view",
+    "leads:create",
+    "leads:update",
     "projects:view",
     "projects:create",
     "projects:update",
@@ -52,6 +55,10 @@ export type Permission =
   | "clients:create"
   | "clients:update"
   | "clients:delete"
+  | "leads:view"
+  | "leads:create"
+  | "leads:update"
+  | "leads:delete"
   | "projects:view"
   | "projects:view_assigned"
   | "projects:create"

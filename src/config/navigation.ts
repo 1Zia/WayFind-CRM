@@ -1,6 +1,7 @@
 import {
   LayoutDashboard,
   Users,
+  Target,
   Briefcase,
   CheckSquare,
   Wallet,
@@ -20,6 +21,11 @@ export const navigationItems = [
     title: "Clients",
     href: "/clients",
     icon: Users,
+  },
+  {
+    title: "Leads",
+    href: "/leads",
+    icon: Target,
   },
   {
     title: "Projects",
