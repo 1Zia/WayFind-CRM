@@ -101,13 +101,101 @@ npm run db:seed
 The seed script is intended for development/demo setup and uses clear demo
 names. It avoids duplicating the same demo records where practical.
 
-## Deployment Notes
+## Deployment
 
-- Configure all required environment variables in the hosting provider.
-- Use a production Neon database connection string for `DATABASE_URL`.
-- Configure Clerk production keys and allowed redirect URLs.
-- Run `npm run build` before deploying.
-- Never commit `.env`, `.env.local`, or production secrets.
+WayFind CRM is ready to deploy on Vercel with Neon PostgreSQL and Clerk.
+
+### Vercel Steps
+
+1. Push the repository to GitHub.
+2. Import the repository into Vercel.
+3. Add the required environment variables in Vercel Project Settings.
+4. Deploy using the default build command:
+
+```bash
+npm run build
+```
+
+Do not configure Vercel to automatically run `db:push` during build unless you
+intentionally want schema changes applied on every deployment.
+
+### Required Environment Variables
+
+Use `.env.example` as the template. Add these values in Vercel:
+
+```env
+DATABASE_URL=""
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=""
+CLERK_SECRET_KEY=""
+NEXT_PUBLIC_CLERK_SIGN_IN_URL="/sign-in"
+NEXT_PUBLIC_CLERK_SIGN_UP_URL="/sign-up"
+NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL="/dashboard"
+NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL="/dashboard"
+CLERK_WEBHOOK_SECRET=""
+```
+
+`CLERK_WEBHOOK_SECRET` is only required after Clerk webhooks are enabled. Never
+commit real secrets.
+
+### Neon Database Setup
+
+- Create a Neon PostgreSQL project.
+- Copy the production pooled connection string into `DATABASE_URL`.
+- For first production setup, apply the schema from a local terminal using the
+  production `DATABASE_URL` carefully:
+
+```bash
+npm run db:push
+```
+
+You can also use generated migrations with:
+
+```bash
+npm run db:generate
+npm run db:migrate
+```
+
+### Clerk Production Checklist
+
+- Add the production domain in Clerk.
+- Configure sign-in and sign-up URLs.
+- Configure allowed redirect URLs.
+- Use production Clerk keys in Vercel.
+- Add a webhook endpoint later if needed: `/api/webhooks/clerk`.
+- Add `CLERK_WEBHOOK_SECRET` only after enabling the webhook.
+
+### First Production Admin
+
+1. Deploy the app with environment variables configured.
+2. Open the production app and sign in once with Clerk.
+3. From a local terminal pointed at the production `DATABASE_URL`, run:
+
+```bash
+npm run admin:make-super -- user@example.com
+```
+
+The script only promotes an existing synced local user. It does not create Clerk
+users.
+
+### Optional Production Seed Data
+
+Seed demo data only when needed:
+
+```bash
+npm run db:seed
+```
+
+Use this carefully in production because it creates demo CRM records.
+
+### Deployment Health Checklist
+
+- `npm run typecheck` passes.
+- `npm run build` passes.
+- Environment variables are added to Vercel.
+- Neon database schema is pushed or migrated.
+- First user has signed in through Clerk.
+- First user is promoted to `super_admin`.
+- Dashboard opens in production.
 
 ## Production Readiness
 
