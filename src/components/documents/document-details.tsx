@@ -4,6 +4,7 @@ type DocumentDetailsProps = {
   clientId?: string | null;
   clientName?: string;
   document: {
+    description: string | null;
     fileName: string;
     fileUrl: string;
     fileType: string;
@@ -13,6 +14,8 @@ type DocumentDetailsProps = {
   };
   projectId?: string | null;
   projectName?: string;
+  uploadedByEmail?: string | null;
+  uploadedByName?: string | null;
 };
 
 function formatSize(bytes: number) {
@@ -33,8 +36,11 @@ export function DocumentDetails({
   document,
   projectId,
   projectName,
+  uploadedByEmail,
+  uploadedByName,
 }: DocumentDetailsProps) {
   const fileTypeLabel = document.fileType || "unknown";
+  const uploader = uploadedByName ?? uploadedByEmail ?? "Unknown user";
 
   return (
     <div className="space-y-6 rounded-xl border bg-white p-6">
@@ -78,6 +84,14 @@ export function DocumentDetails({
           label="Updated"
           value={document.updatedAt.toLocaleDateString()}
         />
+        <Detail label="Uploaded By" value={uploader} />
+      </div>
+
+      <div>
+        <p className="text-sm text-zinc-500">Description</p>
+        <div className="mt-1 whitespace-pre-wrap text-sm font-medium text-zinc-950">
+          {document.description || "-"}
+        </div>
       </div>
 
       <div>

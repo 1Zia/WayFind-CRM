@@ -31,6 +31,7 @@ export default async function DocumentEditPage({
             fileUrl: document.fileUrl,
             fileType: document.fileType,
             fileSize: document.fileSize,
+            description: document.description ?? "",
             clientId: document.clientId ?? "",
             projectId: document.projectId ?? "",
           }}

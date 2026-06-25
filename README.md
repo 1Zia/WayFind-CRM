@@ -16,6 +16,7 @@ team users, and reports.
 - Server Actions
 - Sonner toast
 - Lucide React icons
+- UploadThing file uploads
 
 ## Completed Modules
 
@@ -25,7 +26,7 @@ team users, and reports.
 - Projects
 - Tasks with assignment notifications
 - Finance
-- Documents metadata
+- Documents with UploadThing-backed file upload
 - Database notifications
 - Audit logs
 - Team / users management
@@ -45,9 +46,12 @@ NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
 NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/dashboard
 NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/dashboard
 CLERK_WEBHOOK_SECRET=
+UPLOADTHING_TOKEN=
 ```
 
 `CLERK_WEBHOOK_SECRET` is optional until Clerk webhooks are enabled.
+`UPLOADTHING_TOKEN` is required for document uploads. Create an UploadThing app,
+copy the token from UploadThing, and add it to `.env.local`.
 
 ## Local Development
 
@@ -132,10 +136,12 @@ NEXT_PUBLIC_CLERK_SIGN_UP_URL="/sign-up"
 NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL="/dashboard"
 NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL="/dashboard"
 CLERK_WEBHOOK_SECRET=""
+UPLOADTHING_TOKEN=""
 ```
 
 `CLERK_WEBHOOK_SECRET` is only required after Clerk webhooks are enabled. Never
 commit real secrets.
+`UPLOADTHING_TOKEN` is required for the Documents upload flow.
 
 ### Neon Database Setup
 
@@ -163,6 +169,16 @@ npm run db:migrate
 - Use production Clerk keys in Vercel.
 - Add a webhook endpoint later if needed: `/api/webhooks/clerk`.
 - Add `CLERK_WEBHOOK_SECRET` only after enabling the webhook.
+
+### UploadThing Setup
+
+- Create an UploadThing project/app.
+- Add `UPLOADTHING_TOKEN` to `.env.local` for development.
+- Add the same variable in Vercel Project Settings for production.
+- The app accepts PDF, DOC, DOCX, XLS, XLSX, PNG, JPG, JPEG, and WEBP files up
+  to 16MB.
+- After adding the token, open `/documents/new`, select a file, optionally
+  attach a client/project, and save.
 
 ### First Production Admin
 

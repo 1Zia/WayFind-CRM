@@ -46,6 +46,8 @@ export default async function DocumentPage({
         document={document}
         projectId={document.projectId}
         projectName={projectName}
+        uploadedByEmail={document.uploadedByEmail}
+        uploadedByName={document.uploadedByName}
       />
     </>
   );

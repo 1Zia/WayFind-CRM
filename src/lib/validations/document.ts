@@ -7,6 +7,7 @@ export const documentSchema = z.object({
   fileUrl: z.string().url("Enter a valid file URL"),
   fileType: z.string().min(1, "File type is required"),
   fileSize: z.coerce.number().int().min(0, "File size must be zero or more"),
+  description: z.string().max(2000, "Description is too long").optional(),
   clientId: optionalUuid,
   projectId: optionalUuid,
 });

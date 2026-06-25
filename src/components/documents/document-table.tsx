@@ -13,9 +13,12 @@ type DocumentRow = {
   fileUrl: string;
   fileType: string;
   fileSize: number;
+  description: string | null;
   clientId: string | null;
   projectId: string | null;
   uploadedBy: string;
+  uploadedByEmail: string | null;
+  uploadedByName: string | null;
   createdAt: Date;
 };
 
@@ -89,6 +92,7 @@ export function DocumentTable({
             <th className="px-4 py-3 font-medium">Size</th>
             <th className="px-4 py-3 font-medium">Client</th>
             <th className="px-4 py-3 font-medium">Project</th>
+            <th className="px-4 py-3 font-medium">Uploaded By</th>
             <th className="px-4 py-3 font-medium">Uploaded</th>
             <th className="px-4 py-3 font-medium">Actions</th>
           </tr>
@@ -101,14 +105,33 @@ export function DocumentTable({
               <td className="px-4 py-3">{document.fileType}</td>
               <td className="px-4 py-3">{formatSize(document.fileSize)}</td>
               <td className="px-4 py-3">
-                {document.clientId
-                  ? clientNames.get(document.clientId) ?? document.clientId
-                  : "-"}
+                {document.clientId ? (
+                  <Link
+                    href={`/clients/${document.clientId}`}
+                    className="text-purple-600 hover:underline"
+                  >
+                    {clientNames.get(document.clientId) ?? document.clientId}
+                  </Link>
+                ) : (
+                  "-"
+                )}
               </td>
               <td className="px-4 py-3">
-                {document.projectId
-                  ? projectNames.get(document.projectId) ?? document.projectId
-                  : "-"}
+                {document.projectId ? (
+                  <Link
+                    href={`/projects/${document.projectId}`}
+                    className="text-purple-600 hover:underline"
+                  >
+                    {projectNames.get(document.projectId) ?? document.projectId}
+                  </Link>
+                ) : (
+                  "-"
+                )}
+              </td>
+              <td className="px-4 py-3">
+                {document.uploadedByName ??
+                  document.uploadedByEmail ??
+                  document.uploadedBy}
               </td>
               <td className="px-4 py-3">
                 {document.createdAt.toLocaleDateString()}
@@ -121,6 +144,14 @@ export function DocumentTable({
                   >
                     View
                   </Link>
+                  <a
+                    href={document.fileUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-purple-600 hover:underline"
+                  >
+                    Open
+                  </a>
                   {canUpdate ? (
                     <Link
                       href={`/documents/${document.id}/edit`}
@@ -146,12 +177,13 @@ export function DocumentTable({
 
           {documents.length === 0 && (
             <tr>
-              <td colSpan={7} className="px-4 py-10 text-center text-zinc-500">
+              <td colSpan={8} className="px-4 py-10 text-center text-zinc-500">
                 <div className="font-medium text-zinc-950">
                   No documents yet.
                 </div>
                 <div className="mt-1 text-sm">
-                  Uploaded document metadata will appear here.
+                  Upload contracts, proposals, invoices, receipts, requirement
+                  docs, or design files.
                 </div>
               </td>
             </tr>

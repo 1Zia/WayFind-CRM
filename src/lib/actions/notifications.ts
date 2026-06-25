@@ -46,6 +46,21 @@ export async function getNotifications() {
     .limit(DEFAULT_LIST_LIMIT);
 }
 
+export async function getLatestNotifications(limit = 5) {
+  const user = await requireUser();
+
+  return getLatestNotificationsForUser(user.id, limit);
+}
+
+export async function getLatestNotificationsForUser(userId: string, limit = 5) {
+  return db
+    .select()
+    .from(notifications)
+    .where(eq(notifications.userId, userId))
+    .orderBy(desc(notifications.createdAt))
+    .limit(limit);
+}
+
 export async function getUnreadNotificationsCount() {
   const user = await requireUser();
   return getUnreadNotificationsCountForUser(user.id);

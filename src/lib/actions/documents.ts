@@ -5,7 +5,7 @@ import { z } from "zod";
 import { desc, eq } from "drizzle-orm";
 
 import { db } from "@/db";
-import { clients, documents, projects } from "@/db/schema";
+import { clients, documents, projects, users } from "@/db/schema";
 import { createAuditLog } from "@/lib/audit";
 import { requireUser } from "@/lib/auth";
 import { hasPermission, requirePermission } from "@/lib/permissions";
@@ -65,8 +65,23 @@ export async function getDocuments() {
   requirePermission(user, "documents:view");
 
   return db
-    .select()
+    .select({
+      id: documents.id,
+      fileName: documents.fileName,
+      fileUrl: documents.fileUrl,
+      fileType: documents.fileType,
+      fileSize: documents.fileSize,
+      description: documents.description,
+      clientId: documents.clientId,
+      projectId: documents.projectId,
+      uploadedBy: documents.uploadedBy,
+      uploadedByName: users.name,
+      uploadedByEmail: users.email,
+      createdAt: documents.createdAt,
+      updatedAt: documents.updatedAt,
+    })
     .from(documents)
+    .leftJoin(users, eq(documents.uploadedBy, users.id))
     .orderBy(desc(documents.createdAt))
     .limit(DEFAULT_LIST_LIMIT);
 }
@@ -76,9 +91,26 @@ export async function getDocumentById(id: string) {
   requirePermission(user, "documents:view");
   const documentId = idSchema.parse(id);
 
-  const document = await db.query.documents.findFirst({
-    where: eq(documents.id, documentId),
-  });
+  const [document] = await db
+    .select({
+      id: documents.id,
+      fileName: documents.fileName,
+      fileUrl: documents.fileUrl,
+      fileType: documents.fileType,
+      fileSize: documents.fileSize,
+      description: documents.description,
+      clientId: documents.clientId,
+      projectId: documents.projectId,
+      uploadedBy: documents.uploadedBy,
+      uploadedByName: users.name,
+      uploadedByEmail: users.email,
+      createdAt: documents.createdAt,
+      updatedAt: documents.updatedAt,
+    })
+    .from(documents)
+    .leftJoin(users, eq(documents.uploadedBy, users.id))
+    .where(eq(documents.id, documentId))
+    .limit(1);
 
   if (!document) {
     throw new Error("Document not found");
@@ -100,6 +132,7 @@ export async function createDocument(input: DocumentInput) {
       fileUrl: data.fileUrl,
       fileType: data.fileType,
       fileSize: data.fileSize,
+      description: data.description || null,
       clientId: nullable(data.clientId),
       projectId: nullable(data.projectId),
       uploadedBy: user.id,
@@ -111,7 +144,7 @@ export async function createDocument(input: DocumentInput) {
     action: "create",
     entityType: "document",
     entityId: document.id,
-    description: `Created document metadata ${document.fileName}`,
+    description: `Uploaded document ${document.fileName}`,
   });
 
   revalidateDocumentPaths(document.id);
@@ -136,6 +169,7 @@ export async function updateDocument(id: string, input: DocumentInput) {
       fileUrl: data.fileUrl,
       fileType: data.fileType,
       fileSize: data.fileSize,
+      description: data.description || null,
       clientId: nullable(data.clientId),
       projectId: nullable(data.projectId),
       updatedAt: new Date(),

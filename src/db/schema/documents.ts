@@ -10,6 +10,7 @@ export const documents = pgTable("documents", {
   fileUrl: text("file_url").notNull(),
   fileType: text("file_type").notNull(),
   fileSize: integer("file_size").notNull(),
+  description: text("description"),
   clientId: uuid("client_id").references(() => clients.id),
   projectId: uuid("project_id").references(() => projects.id),
   uploadedBy: uuid("uploaded_by")
