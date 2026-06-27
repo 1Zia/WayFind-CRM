@@ -27,6 +27,11 @@ function formatDate(value: Date | string | null) {
 
 export default async function DashboardPage() {
   const stats = await getDashboardStats();
+
+  if (stats.employeeDashboard) {
+    return <EmployeeDashboard stats={stats.employeeDashboard} />;
+  }
+
   const quickActions = [
     stats.permissions.canCreateClient
       ? { href: "/clients/new", label: "New Client" }
@@ -60,6 +65,12 @@ export default async function DashboardPage() {
         ) : null}
         {stats.permissions.canViewTasks ? (
           <MetricCard title="Pending Tasks" value={stats.pendingTasks} />
+        ) : null}
+        {stats.permissions.canViewTasks ? (
+          <MetricCard
+            title="Active Sprint Tasks"
+            value={stats.activeSprintTasks}
+          />
         ) : null}
         {stats.permissions.canViewFinance ? (
           <>
@@ -210,5 +221,211 @@ export default async function DashboardPage() {
         ) : null}
       </div>
     </>
+  );
+}
+
+type EmployeeDashboardStats = NonNullable<
+  Awaited<ReturnType<typeof getDashboardStats>>["employeeDashboard"]
+>;
+
+function EmployeeDashboard({ stats }: { stats: EmployeeDashboardStats }) {
+  const activeSprintProgress = stats.activeSprint?.totalTasks
+    ? Math.round(
+        (stats.activeSprint.completedTasks / stats.activeSprint.totalTasks) *
+          100,
+      )
+    : 0;
+
+  return (
+    <>
+      <PageHeader
+        title="Dashboard"
+        description="Your assigned work, files, and notifications."
+      />
+
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <MetricCard
+          title="Pending Assigned to Me"
+          value={stats.summary.pendingAssigned}
+        />
+        <MetricCard title="Overdue" value={stats.summary.overdue} />
+        <MetricCard title="Due Today" value={stats.summary.dueToday} />
+        <MetricCard
+          title="Completed This Week"
+          value={stats.summary.completedThisWeek}
+        />
+      </div>
+
+      <div className="mt-6 grid gap-6 xl:grid-cols-2">
+        <SectionCard
+          title="My Active Sprint"
+          description={
+            stats.activeSprint
+              ? `${stats.activeSprint.completedTasks} of ${stats.activeSprint.totalTasks} tasks complete`
+              : "Active sprint work assigned to you will appear here."
+          }
+        >
+          {stats.activeSprint ? (
+            <div className="space-y-4">
+              <div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="font-medium">{stats.activeSprint.name}</span>
+                  <span className="text-zinc-500">{activeSprintProgress}%</span>
+                </div>
+                <div className="mt-2 h-2 rounded-full bg-zinc-100">
+                  <div
+                    className="h-2 rounded-full bg-purple-600"
+                    style={{ width: `${activeSprintProgress}%` }}
+                  />
+                </div>
+                <p className="mt-2 text-xs text-zinc-500">
+                  {formatDate(stats.activeSprint.startDate)} -{" "}
+                  {formatDate(stats.activeSprint.endDate)}
+                </p>
+              </div>
+
+              {stats.activeSprint.tasks.length > 0 ? (
+                <div className="divide-y">
+                  {stats.activeSprint.tasks.map((task) => (
+                    <TaskLink key={task.id} task={task} />
+                  ))}
+                </div>
+              ) : (
+                <EmptyState
+                  title="No assigned sprint tasks"
+                  description="Tasks assigned to you in the active sprint will appear here."
+                />
+              )}
+            </div>
+          ) : (
+            <EmptyState
+              title="No active sprint"
+              description="There is no active sprint assigned to you right now."
+            />
+          )}
+        </SectionCard>
+
+        <SectionCard title="Quick Actions">
+          <div className="flex flex-wrap gap-2">
+            {[
+              { href: "/tasks", label: "View My Tasks" },
+              { href: "/documents/new", label: "Upload Document" },
+              { href: "/notifications", label: "Open Notifications" },
+              { href: "/settings", label: "Update Profile / Settings" },
+            ].map((action) => (
+              <Link
+                key={action.href}
+                href={action.href}
+                className="rounded-lg border px-3 py-2 text-sm font-medium hover:bg-zinc-50"
+              >
+                {action.label}
+              </Link>
+            ))}
+          </div>
+        </SectionCard>
+
+        <SectionCard title="Upcoming Tasks">
+          {stats.upcomingTasks.length > 0 ? (
+            <div className="divide-y">
+              {stats.upcomingTasks.map((task) => (
+                <TaskLink key={task.id} task={task} />
+              ))}
+            </div>
+          ) : (
+            <EmptyState
+              title="No upcoming tasks"
+              description="Assigned tasks with open status will appear here."
+            />
+          )}
+        </SectionCard>
+
+        <SectionCard title="My Documents">
+          {stats.recentDocuments.length > 0 ? (
+            <div className="divide-y">
+              {stats.recentDocuments.map((document) => (
+                <Link
+                  key={document.id}
+                  href={`/documents/${document.id}`}
+                  className="block py-3 text-sm first:pt-0 last:pb-0"
+                >
+                  <p className="font-medium">{document.fileName}</p>
+                  <p className="text-xs text-zinc-500">
+                    {document.fileType} - {formatDate(document.createdAt)}
+                  </p>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <EmptyState
+              title="No documents yet"
+              description="Documents you upload will appear here."
+            />
+          )}
+        </SectionCard>
+
+        <SectionCard title="My Notifications">
+          {stats.unreadNotifications.length > 0 ? (
+            <div className="divide-y">
+              {stats.unreadNotifications.map((notification) => (
+                <Link
+                  key={notification.id}
+                  href={`/notifications/${notification.id}`}
+                  className="block py-3 text-sm first:pt-0 last:pb-0"
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="font-medium">{notification.title}</p>
+                    <StatusBadge tone="info">
+                      {notification.type.replace("_", " ")}
+                    </StatusBadge>
+                  </div>
+                  <p className="mt-1 line-clamp-2 text-xs text-zinc-500">
+                    {notification.message}
+                  </p>
+                  <p className="mt-1 text-xs text-zinc-400">
+                    {formatDate(notification.createdAt)}
+                  </p>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <EmptyState
+              title="No unread notifications"
+              description="New task assignments and alerts will appear here."
+            />
+          )}
+        </SectionCard>
+      </div>
+    </>
+  );
+}
+
+function TaskLink({
+  task,
+}: {
+  task: {
+    id: string;
+    title: string;
+    projectName: string;
+    priority: string;
+    status: string;
+    dueDate: string | null;
+  };
+}) {
+  return (
+    <Link
+      href={`/tasks/${task.id}`}
+      className="flex items-center justify-between gap-4 py-3 text-sm first:pt-0 last:pb-0"
+    >
+      <div className="min-w-0">
+        <p className="truncate font-medium">{task.title}</p>
+        <p className="text-xs text-zinc-500">
+          {task.projectName} - Due {formatDate(task.dueDate)}
+        </p>
+      </div>
+      <div className="flex shrink-0 items-center gap-2">
+        <StatusBadge tone="info">{task.priority}</StatusBadge>
+        <StatusBadge>{task.status.replace("_", " ")}</StatusBadge>
+      </div>
+    </Link>
   );
 }

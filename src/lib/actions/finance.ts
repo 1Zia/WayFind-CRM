@@ -9,6 +9,7 @@ import { clients, expenses, income, invoices, projects, users } from "@/db/schem
 import { createAuditLog } from "@/lib/audit";
 import { requireUser } from "@/lib/auth";
 import { requirePermission } from "@/lib/permissions";
+import { withSafeFallback } from "@/lib/safe-action";
 import {
   expenseSchema,
   incomeSchema,
@@ -48,28 +49,43 @@ export async function getFinanceFormOptions() {
   await requireFinance("finance:view");
 
   const [clientOptions, projectOptions, userOptions] = await Promise.all([
-    db
-      .select({
-        id: clients.id,
-        name: clients.companyName,
-      })
-      .from(clients)
-      .orderBy(desc(clients.createdAt)),
-    db
-      .select({
-        id: projects.id,
-        name: projects.name,
-      })
-      .from(projects)
-      .orderBy(desc(projects.createdAt)),
-    db
-      .select({
-        id: users.id,
-        name: users.name,
-      })
-      .from(users)
-      .where(eq(users.status, "active"))
-      .orderBy(desc(users.createdAt)),
+    withSafeFallback(
+      "finance.form.clients",
+      () =>
+        db
+          .select({
+            id: clients.id,
+            name: clients.companyName,
+          })
+          .from(clients)
+          .orderBy(desc(clients.createdAt)),
+      [],
+    ),
+    withSafeFallback(
+      "finance.form.projects",
+      () =>
+        db
+          .select({
+            id: projects.id,
+            name: projects.name,
+          })
+          .from(projects)
+          .orderBy(desc(projects.createdAt)),
+      [],
+    ),
+    withSafeFallback(
+      "finance.form.users",
+      () =>
+        db
+          .select({
+            id: users.id,
+            name: users.name,
+          })
+          .from(users)
+          .where(eq(users.status, "active"))
+          .orderBy(desc(users.createdAt)),
+      [],
+    ),
   ]);
 
   return {
@@ -82,46 +98,55 @@ export async function getFinanceFormOptions() {
 export async function getFinanceSummary() {
   await requireFinance("finance:view");
 
-  const [incomeRows, expenseRows, invoiceRows] = await Promise.all([
-    db.select().from(income),
-    db.select().from(expenses),
-    db.select().from(invoices),
-  ]);
+  return withSafeFallback(
+    "finance.summary",
+    async () => {
+      const [incomeRows, expenseRows, invoiceRows] = await Promise.all([
+        db.select().from(income),
+        db.select().from(expenses),
+        db.select().from(invoices),
+      ]);
 
-  const totalIncome = incomeRows
-    .filter((item) => item.status === "paid")
-    .reduce((total, item) => total + item.amount, 0);
+      const totalIncome = incomeRows
+        .filter((item) => item.status === "paid")
+        .reduce((total, item) => total + item.amount, 0);
 
-  const totalExpenses = expenseRows.reduce(
-    (total, item) => total + item.amount,
-    0,
+      const totalExpenses = expenseRows.reduce(
+        (total, item) => total + item.amount,
+        0,
+      );
+
+      const unpaidInvoices = invoiceRows
+        .filter((item) => item.status !== "paid" && item.status !== "cancelled")
+        .reduce((total, item) => total + item.amount, 0);
+
+      return {
+        totalIncome,
+        totalExpenses,
+        profitLoss: totalIncome - totalExpenses,
+        unpaidInvoices,
+      };
+    },
+    { totalIncome: 0, totalExpenses: 0, profitLoss: 0, unpaidInvoices: 0 },
   );
-
-  const unpaidInvoices = invoiceRows
-    .filter((item) => item.status !== "paid" && item.status !== "cancelled")
-    .reduce((total, item) => total + item.amount, 0);
-
-  return {
-    totalIncome,
-    totalExpenses,
-    profitLoss: totalIncome - totalExpenses,
-    unpaidInvoices,
-  };
 }
 
 export async function getFinanceReports() {
   await requireFinance("finance:view");
 
-  const [incomeRows, expenseRows, projectRows] = await Promise.all([
-    db.select().from(income),
-    db.select().from(expenses),
-    db
-      .select({
-        id: projects.id,
-        name: projects.name,
-      })
-      .from(projects),
-  ]);
+  return withSafeFallback(
+    "finance.reports",
+    async () => {
+      const [incomeRows, expenseRows, projectRows] = await Promise.all([
+        db.select().from(income),
+        db.select().from(expenses),
+        db
+          .select({
+            id: projects.id,
+            name: projects.name,
+          })
+          .from(projects),
+      ]);
 
   const projectNames = new Map(
     projectRows.map((project) => [project.id, project.name]),
@@ -186,24 +211,32 @@ export async function getFinanceReports() {
     monthlyTotals.set(month, current);
   }
 
-  return {
-    monthlyTotals: Array.from(monthlyTotals.values()).sort((a, b) =>
-      b.month.localeCompare(a.month),
-    ),
-    projectRevenue: Array.from(projectRevenue.values()).sort(
-      (a, b) => b.revenue - a.revenue,
-    ),
-  };
+      return {
+        monthlyTotals: Array.from(monthlyTotals.values()).sort((a, b) =>
+          b.month.localeCompare(a.month),
+        ),
+        projectRevenue: Array.from(projectRevenue.values()).sort(
+          (a, b) => b.revenue - a.revenue,
+        ),
+      };
+    },
+    { monthlyTotals: [], projectRevenue: [] },
+  );
 }
 
 export async function getIncome() {
   await requireFinance("finance:view");
 
-  return db
-    .select()
-    .from(income)
-    .orderBy(desc(income.paymentDate))
-    .limit(DEFAULT_LIST_LIMIT);
+  return withSafeFallback(
+    "finance.income.list",
+    () =>
+      db
+        .select()
+        .from(income)
+        .orderBy(desc(income.paymentDate))
+        .limit(DEFAULT_LIST_LIMIT),
+    [],
+  );
 }
 
 export async function createIncome(input: IncomeInput) {
@@ -281,11 +314,16 @@ export async function updateIncome(id: string, input: IncomeInput) {
 export async function getExpenses() {
   await requireFinance("finance:view");
 
-  return db
-    .select()
-    .from(expenses)
-    .orderBy(desc(expenses.date))
-    .limit(DEFAULT_LIST_LIMIT);
+  return withSafeFallback(
+    "finance.expenses.list",
+    () =>
+      db
+        .select()
+        .from(expenses)
+        .orderBy(desc(expenses.date))
+        .limit(DEFAULT_LIST_LIMIT),
+    [],
+  );
 }
 
 export async function createExpense(input: ExpenseInput) {
@@ -363,11 +401,16 @@ export async function updateExpense(id: string, input: ExpenseInput) {
 export async function getInvoices() {
   await requireFinance("finance:view");
 
-  return db
-    .select()
-    .from(invoices)
-    .orderBy(desc(invoices.issueDate))
-    .limit(DEFAULT_LIST_LIMIT);
+  return withSafeFallback(
+    "finance.invoices.list",
+    () =>
+      db
+        .select()
+        .from(invoices)
+        .orderBy(desc(invoices.issueDate))
+        .limit(DEFAULT_LIST_LIMIT),
+    [],
+  );
 }
 
 export async function createInvoice(input: InvoiceInput) {

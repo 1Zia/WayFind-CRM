@@ -7,3 +7,4 @@ export * from "./finance";
 export * from "./documents";
 export * from "./notifications";
 export * from "./leads";
+export * from "./sprints";

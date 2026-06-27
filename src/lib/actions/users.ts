@@ -16,7 +16,7 @@ const userRoleSchema = z.enum([
   "project_manager",
   "employee",
 ]);
-const userStatusSchema = z.enum(["active", "inactive", "suspended"]);
+const userStatusSchema = z.enum(["active", "suspended", "disabled"]);
 
 async function requireSuperAdmin() {
   const user = await requireUser();
@@ -123,7 +123,7 @@ export async function updateUserStatus(userId: string, status: string) {
     nextStatus !== "active" &&
     (await isOnlySuperAdmin(targetUserId))
   ) {
-    throw new Error("Cannot deactivate or suspend the only super admin.");
+    throw new Error("Cannot disable or suspend the only super admin.");
   }
 
   const [updatedUser] = await db
@@ -141,10 +141,10 @@ export async function updateUserStatus(userId: string, status: string) {
 
   await createAuditLog({
     userId: actor.id,
-    action: "update_status",
+    action: "update_account_status",
     entityType: "user",
     entityId: updatedUser.id,
-    description: `Updated user status for ${updatedUser.email} to ${nextStatus}`,
+    description: `Updated account status for ${updatedUser.email} to ${nextStatus}`,
   });
 
   revalidateUserPaths(updatedUser.id);

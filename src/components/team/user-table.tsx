@@ -1,11 +1,19 @@
 import Link from "next/link";
 
+import {
+  formatLastSeen,
+  formatPresenceStatus,
+  getPresenceStatus,
+  type PresenceStatus,
+} from "@/lib/presence";
+
 type User = {
   id: string;
   name: string;
   email: string;
   role: "super_admin" | "finance_manager" | "project_manager" | "employee";
-  status: "active" | "inactive" | "suspended";
+  status: "active" | "inactive" | "suspended" | "disabled";
+  lastSeenAt: Date | null;
   createdAt: Date;
 };
 
@@ -28,7 +36,8 @@ export function UserTable({ users }: UserTableProps) {
           <tr>
             <th className="px-4 py-3 font-medium">User</th>
             <th className="px-4 py-3 font-medium">Role</th>
-            <th className="px-4 py-3 font-medium">Status</th>
+            <th className="px-4 py-3 font-medium">Account Status</th>
+            <th className="px-4 py-3 font-medium">Presence</th>
             <th className="px-4 py-3 font-medium">Created</th>
             <th className="px-4 py-3 font-medium">Action</th>
           </tr>
@@ -47,6 +56,12 @@ export function UserTable({ users }: UserTableProps) {
               <td className="px-4 py-3">
                 <StatusBadge status={user.status} />
               </td>
+              <td className="px-4 py-3">
+                <PresenceBadge
+                  lastSeenAt={user.lastSeenAt}
+                  status={getPresenceStatus(user.lastSeenAt)}
+                />
+              </td>
               <td className="px-4 py-3">{user.createdAt.toLocaleString()}</td>
               <td className="px-4 py-3">
                 <Link
@@ -61,7 +76,7 @@ export function UserTable({ users }: UserTableProps) {
 
           {users.length === 0 && (
             <tr>
-              <td colSpan={5} className="px-4 py-10 text-center text-zinc-500">
+              <td colSpan={6} className="px-4 py-10 text-center text-zinc-500">
                 <div className="font-medium text-zinc-950">No users yet.</div>
                 <div className="mt-1 text-sm">
                   Team members will appear here after they sign in or sync.
@@ -87,13 +102,39 @@ function StatusBadge({ status }: { status: User["status"] }) {
   const classes =
     status === "active"
       ? "bg-emerald-50 text-emerald-700"
-      : status === "inactive"
+      : status === "inactive" || status === "disabled"
         ? "bg-zinc-100 text-zinc-700"
         : "bg-red-50 text-red-700";
 
   return (
     <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${classes}`}>
-      {status}
+      {status === "inactive" ? "disabled" : status}
     </span>
+  );
+}
+
+function PresenceBadge({
+  lastSeenAt,
+  status,
+}: {
+  lastSeenAt: Date | null;
+  status: PresenceStatus;
+}) {
+  const classes =
+    status === "online"
+      ? "bg-emerald-50 text-emerald-700"
+      : status === "away"
+        ? "bg-amber-50 text-amber-700"
+        : "bg-zinc-100 text-zinc-700";
+
+  return (
+    <div className="space-y-1">
+      <span
+        className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${classes}`}
+      >
+        {formatPresenceStatus(status)}
+      </span>
+      <div className="text-xs text-zinc-500">{formatLastSeen(lastSeenAt)}</div>
+    </div>
   );
 }

@@ -15,18 +15,30 @@ type TaskOption = {
 type TaskFormProps = {
   task?: TaskInput & { id: string };
   projects?: TaskOption[];
+  sprints?: Array<TaskOption & { status?: string }>;
   users?: TaskOption[];
 };
 
-export function TaskForm({ task, projects = [], users = [] }: TaskFormProps) {
+export function TaskForm({
+  task,
+  projects = [],
+  sprints = [],
+  users = [],
+}: TaskFormProps) {
   const router = useRouter();
 
   const [form, setForm] = useState<TaskInput>({
     projectId: task?.projectId ?? "",
+    sprintId: task?.sprintId ?? "",
     title: task?.title ?? "",
     description: task?.description ?? "",
     assignedTo: task?.assignedTo ?? "",
     priority: task?.priority ?? "medium",
+    type: task?.type ?? "feature",
+    taskCode: task?.taskCode ?? "",
+    estimatePoints: task?.estimatePoints ?? 0,
+    epic: task?.epic ?? "",
+    githubLink: task?.githubLink ?? "",
     dueDate: task?.dueDate ?? "",
     status: task?.status ?? "todo",
   });
@@ -104,6 +116,23 @@ export function TaskForm({ task, projects = [], users = [] }: TaskFormProps) {
       </div>
 
       <div>
+        <label className="text-sm font-medium">Sprint</label>
+        <select
+          value={form.sprintId ?? ""}
+          onChange={(e) => updateField("sprintId", e.target.value)}
+          className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
+        >
+          <option value="">Backlog</option>
+          {sprints.map((sprint) => (
+            <option key={sprint.id} value={sprint.id}>
+              {sprint.name}
+              {sprint.status ? ` (${sprint.status})` : ""}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div>
         <label className="text-sm font-medium">Assigned To</label>
         <select
           value={form.assignedTo ?? ""}
@@ -137,6 +166,24 @@ export function TaskForm({ task, projects = [], users = [] }: TaskFormProps) {
         </div>
 
         <div>
+          <label className="text-sm font-medium">Type</label>
+          <select
+            value={form.type}
+            onChange={(e) =>
+              updateField("type", e.target.value as TaskInput["type"])
+            }
+            className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
+          >
+            <option value="feature">Feature</option>
+            <option value="bug">Bug</option>
+            <option value="improvement">Improvement</option>
+            <option value="research">Research</option>
+            <option value="testing">Testing</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <div>
           <label className="text-sm font-medium">Status</label>
           <select
             value={form.status}
@@ -151,6 +198,52 @@ export function TaskForm({ task, projects = [], users = [] }: TaskFormProps) {
             <option value="done">Done</option>
           </select>
         </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="text-sm font-medium">Task ID / Code</label>
+          <input
+            value={form.taskCode ?? ""}
+            onChange={(e) => updateField("taskCode", e.target.value)}
+            className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
+            placeholder="WAY-001"
+          />
+        </div>
+
+        <div>
+          <label className="text-sm font-medium">Estimate Points</label>
+          <input
+            type="number"
+            min={0}
+            max={100}
+            value={form.estimatePoints ?? 0}
+            onChange={(e) =>
+              updateField("estimatePoints", Number(e.target.value))
+            }
+            className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
+          />
+        </div>
+      </div>
+
+      <div>
+        <label className="text-sm font-medium">Epic</label>
+        <input
+          value={form.epic ?? ""}
+          onChange={(e) => updateField("epic", e.target.value)}
+          className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
+          placeholder="Optional epic or milestone"
+        />
+      </div>
+
+      <div>
+        <label className="text-sm font-medium">GitHub Link</label>
+        <input
+          value={form.githubLink ?? ""}
+          onChange={(e) => updateField("githubLink", e.target.value)}
+          className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
+          placeholder="Optional URL"
+        />
       </div>
 
       <div>

@@ -1,5 +1,10 @@
 import { UserRoleSelect } from "@/components/team/user-role-select";
 import { UserStatusSelect } from "@/components/team/user-status-select";
+import {
+  formatLastSeen,
+  formatPresenceStatus,
+  getPresenceStatus,
+} from "@/lib/presence";
 
 type User = {
   id: string;
@@ -8,7 +13,8 @@ type User = {
   email: string;
   imageUrl: string | null;
   role: "super_admin" | "finance_manager" | "project_manager" | "employee";
-  status: "active" | "inactive" | "suspended";
+  status: "active" | "inactive" | "suspended" | "disabled";
+  lastSeenAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -20,6 +26,7 @@ type UserDetailsProps = {
 
 export function UserDetails({ user, currentUserId }: UserDetailsProps) {
   const isCurrentUser = user.id === currentUserId;
+  const presenceStatus = getPresenceStatus(user.lastSeenAt);
 
   return (
     <div className="space-y-6 rounded-xl border bg-white p-6">
@@ -44,7 +51,12 @@ export function UserDetails({ user, currentUserId }: UserDetailsProps) {
 
       <div className="grid gap-4 text-sm md:grid-cols-2">
         <Detail label="Role" value={user.role.replace("_", " ")} />
-        <Detail label="Status" value={user.status} />
+        <Detail label="Account Status" value={formatAccountStatus(user.status)} />
+        <Detail
+          label="Presence Status"
+          value={formatPresenceStatus(presenceStatus)}
+        />
+        <Detail label="Last Seen" value={formatLastSeen(user.lastSeenAt)} />
         <Detail label="Clerk ID" value={user.clerkId} />
         <Detail label="Created" value={user.createdAt.toLocaleString()} />
         <Detail label="Updated" value={user.updatedAt.toLocaleString()} />
@@ -61,7 +73,7 @@ export function UserDetails({ user, currentUserId }: UserDetailsProps) {
         </div>
 
         <div>
-          <p className="mb-2 text-sm font-medium">Change Status</p>
+          <p className="mb-2 text-sm font-medium">Change Account Status</p>
           <UserStatusSelect
             isCurrentUser={isCurrentUser}
             userId={user.id}
@@ -80,4 +92,9 @@ function Detail({ label, value }: { label: string; value: string }) {
       <div className="mt-1 font-medium text-zinc-950">{value}</div>
     </div>
   );
+}
+
+function formatAccountStatus(status: User["status"]) {
+  const normalizedStatus = status === "inactive" ? "disabled" : status;
+  return normalizedStatus.charAt(0).toUpperCase() + normalizedStatus.slice(1);
 }

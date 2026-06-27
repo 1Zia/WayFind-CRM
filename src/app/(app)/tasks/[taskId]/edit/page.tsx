@@ -33,13 +33,20 @@ export default async function TaskEditPage({
         task={{
           id: task.id,
           projectId: task.projectId ?? "",
+          sprintId: task.sprintId ?? "",
           title: task.title,
           description: task.description ?? "",
           assignedTo: task.assignedTo ?? "",
           priority: task.priority,
+          type: task.type,
+          taskCode: task.taskCode ?? "",
+          estimatePoints: task.estimatePoints,
+          epic: task.epic ?? "",
+          githubLink: task.githubLink ?? "",
           dueDate: task.dueDate ?? "",
           status: task.status,
         }}
+        sprints={options.sprints}
       />
     </>
   );

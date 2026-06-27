@@ -6,13 +6,14 @@ import { toast } from "sonner";
 
 import { updateUserStatus } from "@/lib/actions/users";
 
-const statuses = ["active", "inactive", "suspended"] as const;
+const statuses = ["active", "suspended", "disabled"] as const;
 
 type Status = (typeof statuses)[number];
+type LegacyStatus = Status | "inactive";
 
 type UserStatusSelectProps = {
   userId: string;
-  value: Status;
+  value: LegacyStatus;
   isCurrentUser: boolean;
 };
 
@@ -22,7 +23,8 @@ export function UserStatusSelect({
   isCurrentUser,
 }: UserStatusSelectProps) {
   const router = useRouter();
-  const [status, setStatus] = useState<Status>(value);
+  const currentStatus = value === "inactive" ? "disabled" : value;
+  const [status, setStatus] = useState<Status>(currentStatus);
   const [loading, setLoading] = useState(false);
 
   async function handleSave() {
@@ -32,7 +34,7 @@ export function UserStatusSelect({
       );
 
       if (!confirmed) {
-        setStatus(value);
+        setStatus(currentStatus);
         return;
       }
     }
@@ -40,13 +42,13 @@ export function UserStatusSelect({
     try {
       setLoading(true);
       await updateUserStatus(userId, status);
-      toast.success("User status updated");
+      toast.success("Account status updated");
       router.refresh();
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "Something went wrong",
       );
-      setStatus(value);
+      setStatus(currentStatus);
     } finally {
       setLoading(false);
     }
@@ -61,18 +63,22 @@ export function UserStatusSelect({
       >
         {statuses.map((item) => (
           <option key={item} value={item}>
-            {item}
+            {formatStatus(item)}
           </option>
         ))}
       </select>
       <button
         type="button"
-        disabled={loading || status === value}
+        disabled={loading || status === currentStatus}
         onClick={handleSave}
         className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-60"
       >
-        {loading ? "Saving..." : "Save Status"}
+        {loading ? "Saving..." : "Save Account Status"}
       </button>
     </div>
   );
+}
+
+function formatStatus(status: Status) {
+  return status.charAt(0).toUpperCase() + status.slice(1);
 }

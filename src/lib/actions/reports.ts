@@ -13,6 +13,7 @@ import {
   tasks,
 } from "@/db/schema";
 import { requireUser } from "@/lib/auth";
+import { withSafeFallback } from "@/lib/safe-action";
 
 type ReportRole = "super_admin" | "finance_manager" | "project_manager";
 
@@ -241,30 +242,38 @@ function buildBusinessOverviewReport({
 }
 
 export async function getFinanceReport() {
-  return buildFinanceReport(await getReportRole());
+  const role = await getReportRole();
+  return withSafeFallback("reports.finance", () => buildFinanceReport(role), null);
 }
 
 export async function getProjectReport() {
-  return buildProjectReport(await getReportRole());
+  const role = await getReportRole();
+  return withSafeFallback("reports.projects", () => buildProjectReport(role), null);
 }
 
 export async function getTaskReport() {
-  return buildTaskReport(await getReportRole());
+  const role = await getReportRole();
+  return withSafeFallback("reports.tasks", () => buildTaskReport(role), null);
 }
 
 export async function getLeadReport() {
-  return buildLeadReport(await getReportRole());
+  const role = await getReportRole();
+  return withSafeFallback("reports.leads", () => buildLeadReport(role), null);
 }
 
 export async function getBusinessOverviewReport() {
   const role = await getReportRole();
   const [clientCountResult, financeReport, projectReport, taskReport, leadReport] =
     await Promise.all([
-      db.select({ count: count() }).from(clients),
-      buildFinanceReport(role),
-      buildProjectReport(role),
-      buildTaskReport(role),
-      buildLeadReport(role),
+      withSafeFallback(
+        "reports.overview.clients",
+        () => db.select({ count: count() }).from(clients),
+        [{ count: 0 }],
+      ),
+      withSafeFallback("reports.overview.finance", () => buildFinanceReport(role), null),
+      withSafeFallback("reports.overview.projects", () => buildProjectReport(role), null),
+      withSafeFallback("reports.overview.tasks", () => buildTaskReport(role), null),
+      withSafeFallback("reports.overview.leads", () => buildLeadReport(role), null),
     ]);
 
   return buildBusinessOverviewReport({
@@ -280,11 +289,15 @@ export async function getReportsPageData() {
   const role = await getReportRole();
   const [clientCountResult, financeReport, projectReport, taskReport, leadReport] =
     await Promise.all([
-      db.select({ count: count() }).from(clients),
-      buildFinanceReport(role),
-      buildProjectReport(role),
-      buildTaskReport(role),
-      buildLeadReport(role),
+      withSafeFallback(
+        "reports.page.clients",
+        () => db.select({ count: count() }).from(clients),
+        [{ count: 0 }],
+      ),
+      withSafeFallback("reports.page.finance", () => buildFinanceReport(role), null),
+      withSafeFallback("reports.page.projects", () => buildProjectReport(role), null),
+      withSafeFallback("reports.page.tasks", () => buildTaskReport(role), null),
+      withSafeFallback("reports.page.leads", () => buildLeadReport(role), null),
     ]);
   const overview = buildBusinessOverviewReport({
     clientCount: clientCountResult[0]?.count ?? 0,

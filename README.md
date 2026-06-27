@@ -55,6 +55,32 @@ copy the token from UploadThing, and add it to `.env.local`.
 
 ## Local Development
 
+### Local Development Runtime
+
+Recommended Node.js version: `20.x`.
+
+Next.js 14 is stable on Node 20 LTS. Newer unsupported runtimes, including
+Node 24, can crash during `npm run dev` with Edge Runtime syntax errors such as
+`Unexpected identifier 'Object'`.
+
+On Windows, use `nvm-windows`:
+
+```bash
+nvm install 20.11.1
+nvm use 20.11.1
+node -v
+```
+
+After switching Node versions, clean reinstall dependencies:
+
+```bash
+# Delete node_modules
+# Delete .next
+# Delete package-lock.json only if needed
+npm install
+npm run dev
+```
+
 ```bash
 npm install
 npm run dev
@@ -63,8 +89,11 @@ npm run dev
 Useful checks:
 
 ```bash
+npm run db:push
 npm run typecheck
 npm run build
+npm run test:smoke
+npm run dev
 ```
 
 ## Database Commands
@@ -74,6 +103,7 @@ npm run db:generate
 npm run db:migrate
 npm run db:push
 npm run db:seed
+npm run test:smoke
 ```
 
 Use `db:push` carefully in production environments. Prefer generated
@@ -207,11 +237,52 @@ Use this carefully in production because it creates demo CRM records.
 
 - `npm run typecheck` passes.
 - `npm run build` passes.
+- `npm run test:smoke` passes.
 - Environment variables are added to Vercel.
 - Neon database schema is pushed or migrated.
 - First user has signed in through Clerk.
 - First user is promoted to `super_admin`.
 - Dashboard opens in production.
+
+## Final QA Checklist
+
+Run local validation before deploying:
+
+```bash
+nvm use 20.11.1
+npm run db:push
+npm run typecheck
+npm run build
+npm run test:smoke
+npm run dev
+```
+
+Manually test these routes:
+
+- `/dashboard`
+- `/clients`
+- `/leads`
+- `/projects`
+- `/tasks`
+- `/finance`
+- `/documents`
+- `/notifications`
+- `/reports`
+- `/audit-logs`
+- `/team/users`
+- `/settings`
+
+Role-test the app as `super_admin`, `project_manager`, `finance_manager`, and
+`employee`. Confirm hidden navigation and server-side permissions match each
+role.
+
+For Vercel deployment:
+
+- Push the GitHub repository.
+- Import the repository in Vercel.
+- Add the required environment variables.
+- Deploy.
+- Test the live URL.
 
 ## Production Readiness
 
@@ -219,3 +290,19 @@ The app validates required environment variables at startup, protects app routes
 with Clerk middleware, and keeps server-side permission checks in Server Actions.
 UI role restrictions are for usability only; backend checks remain the source of
 truth.
+
+## Runtime Troubleshooting
+
+If runtime database query errors occur during local development:
+
+```bash
+npm run db:push
+npm run test:smoke
+npm run typecheck
+npm run build
+npm run dev
+```
+
+Also verify `DATABASE_URL` points to the expected Neon database, restart the dev
+server after schema changes, and confirm optional services such as UploadThing
+are configured only for the features that use them.

@@ -4,10 +4,16 @@ import { PageHeader } from "@/components/shared/page-header";
 import { SectionCard } from "@/components/shared/section-card";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { requireUser } from "@/lib/auth";
+import {
+  formatLastSeen,
+  formatPresenceStatus,
+  getPresenceStatus,
+} from "@/lib/presence";
 
 export default async function SettingsPage() {
   const user = await requireUser();
   const isSuperAdmin = user.role === "super_admin";
+  const presenceStatus = getPresenceStatus(user.lastSeenAt);
 
   return (
     <>
@@ -35,7 +41,10 @@ export default async function SettingsPage() {
               <InfoRow label="Name" value={user.name} />
               <InfoRow label="Email" value={user.email} />
               <InfoRow label="Role" value={formatLabel(user.role)} />
-              <InfoRow label="Status" value={formatLabel(user.status)} />
+              <InfoRow
+                label="Account Status"
+                value={formatAccountStatus(user.status)}
+              />
               <InfoRow
                 label="Account Created"
                 value={formatDate(user.createdAt)}
@@ -63,10 +72,10 @@ export default async function SettingsPage() {
           </div>
         </SectionCard>
 
-        <SectionCard title="Status">
+        <SectionCard title="Account Status">
           <div className="space-y-4">
-            <StatusBadge tone={statusTone(user.status)}>
-              {formatLabel(user.status)}
+            <StatusBadge tone={accountStatusTone(user.status)}>
+              {formatAccountStatus(user.status)}
             </StatusBadge>
             <p className="text-sm text-zinc-500">
               {isSuperAdmin
@@ -81,6 +90,18 @@ export default async function SettingsPage() {
                 Manage user statuses
               </Link>
             ) : null}
+          </div>
+        </SectionCard>
+
+        <SectionCard title="Your Presence">
+          <div className="space-y-4">
+            <StatusBadge tone={presenceTone(presenceStatus)}>
+              {formatPresenceStatus(presenceStatus)}
+            </StatusBadge>
+            <div className="space-y-1 text-sm text-zinc-500">
+              <p>Presence is updated automatically while you use WayFind.</p>
+              <p>Last active: {formatLastSeen(user.lastSeenAt)}</p>
+            </div>
           </div>
         </SectionCard>
 
@@ -141,13 +162,29 @@ function formatDate(value: Date) {
   }).format(value);
 }
 
-function statusTone(status: string) {
+function formatAccountStatus(status: string) {
+  return formatLabel(status === "inactive" ? "disabled" : status);
+}
+
+function accountStatusTone(status: string) {
   if (status === "active") {
     return "success";
   }
 
   if (status === "suspended") {
     return "danger";
+  }
+
+  return "default";
+}
+
+function presenceTone(status: string) {
+  if (status === "online") {
+    return "success";
+  }
+
+  if (status === "away") {
+    return "warning";
   }
 
   return "default";

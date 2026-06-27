@@ -15,6 +15,7 @@ export default async function TaskPage({
   ]);
 
   const project = options.projects.find((item) => item.id === task.projectId);
+  const sprint = options.sprints.find((item) => item.id === task.sprintId);
   const assignedUser = options.users.find((item) => item.id === task.assignedTo);
   const isOverdue =
     task.dueDate &&
@@ -66,6 +67,11 @@ export default async function TaskPage({
           </div>
 
           <div>
+            <p className="text-zinc-500">Sprint</p>
+            <div>{sprint?.name ?? "Backlog"}</div>
+          </div>
+
+          <div>
             <p className="text-zinc-500">Priority</p>
             <div className="mt-1">
               <StatusBadge
@@ -90,6 +96,26 @@ export default async function TaskPage({
                 <StatusBadge tone="danger">overdue</StatusBadge>
               ) : null}
             </div>
+          </div>
+
+          <div>
+            <p className="text-zinc-500">Type</p>
+            <div className="mt-1 capitalize">{task.type}</div>
+          </div>
+
+          <div>
+            <p className="text-zinc-500">Task ID</p>
+            <div className="mt-1">{task.taskCode ?? `TASK-${task.id.slice(0, 4)}`}</div>
+          </div>
+
+          <div>
+            <p className="text-zinc-500">Estimate</p>
+            <div className="mt-1">{task.estimatePoints} SP</div>
+          </div>
+
+          <div>
+            <p className="text-zinc-500">Epic</p>
+            <div className="mt-1">{task.epic ?? "-"}</div>
           </div>
         </div>
 

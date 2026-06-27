@@ -2,6 +2,9 @@
   "name": "wayfind",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": "20.x"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -12,11 +15,14 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:seed": "tsx scripts/seed.ts",
+    "test:smoke": "tsx scripts/smoke-test.ts",
     "admin:make-super": "tsx scripts/create-super-admin.ts"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.39.5",
+    "@clerk/shared": "^3.47.7",
     "@neondatabase/serverless": "^1.0.0",
+    "@next/swc-win32-x64-msvc": "^14.2.33",
     "@uploadthing/react": "^7.3.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

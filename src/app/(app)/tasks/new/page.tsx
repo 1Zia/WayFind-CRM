@@ -18,7 +18,11 @@ export default async function TasksNewPage() {
         <p className="mt-1 text-sm text-zinc-500">Create a new task.</p>
       </div>
 
-      <TaskForm projects={options.projects} users={options.users} />
+      <TaskForm
+        projects={options.projects}
+        sprints={options.sprints}
+        users={options.users}
+      />
     </>
   );
 }
