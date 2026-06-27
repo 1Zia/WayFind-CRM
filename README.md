@@ -293,6 +293,24 @@ truth.
 
 ## Runtime Troubleshooting
 
+If Vercel fails during install with an error like
+`Unsupported platform for @next/swc-win32-x64-msvc`, a platform-specific Next.js
+SWC package was likely installed manually or locked as a root dependency. Do not
+add `@next/swc-*` packages to `package.json`; Next.js manages those optional
+platform packages automatically.
+
+To repair the install state:
+
+```bash
+rm -rf node_modules
+rm -f package-lock.json
+npm install
+```
+
+Commit the regenerated `package-lock.json` and push again. The lockfile may
+still contain `@next/swc-*` entries as optional dependencies under `next`, but
+they should not appear in the root project dependency list.
+
 If runtime database query errors occur during local development:
 
 ```bash
