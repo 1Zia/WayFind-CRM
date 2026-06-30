@@ -127,7 +127,7 @@ export function MessageBubble({
   }
 
   return (
-    <div className={`group relative flex gap-3 my-4 max-w-[85%] ${isSelf ? "ml-auto flex-row-reverse" : "mr-auto"}`}>
+    <div className={`group relative flex gap-3 my-4 max-w-[85%] w-fit ${isSelf ? "ml-auto flex-row-reverse" : "mr-auto"}`}>
       {/* Sender Avatar */}
       {!isSelf && (
         <div className="h-9 w-9 shrink-0 select-none">
@@ -258,6 +258,72 @@ export function MessageBubble({
               {formattedTime}
             </span>
           )}
+
+          {/* Floating Action Toolbar on hover */}
+          {!message.isDeleted && !isEditing && (
+            <div className={`absolute top-1/2 -translate-y-1/2 z-10 hidden group-hover:flex items-center gap-1 bg-crm-surface border border-crm-border rounded-lg p-1 shadow-dropdown transition-all animate-in fade-in slide-in-from-top-1 duration-150 ${
+              isSelf ? "right-full mr-2" : "left-full ml-2"
+            }`}>
+              {/* Reaction Picker Button */}
+              <div className="relative">
+                <button
+                  onClick={() => setShowEmojiPicker((prev) => !prev)}
+                  className="rounded-md p-1.5 text-crm-muted hover:bg-crm-body hover:text-crm-heading"
+                  title="Add Reaction"
+                >
+                  <Smile className="h-4 w-4" />
+                </button>
+                {showEmojiPicker && (
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 z-20 mb-2 flex gap-1 rounded-full border border-crm-border bg-crm-surface p-1 shadow-dropdown animate-in zoom-in duration-100">
+                    {emojiOptions.map((emoji) => (
+                      <button
+                        key={emoji}
+                        onClick={() => handleReact(emoji)}
+                        className="h-7 w-7 text-sm hover:scale-125 transition-transform"
+                      >
+                        {emoji}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Reply */}
+              <button
+                onClick={() => onReply(message)}
+                className="rounded-md p-1.5 text-crm-muted hover:bg-crm-body hover:text-crm-heading"
+                title="Reply"
+              >
+                <CornerUpLeft className="h-4 w-4" />
+              </button>
+
+              {/* Edit */}
+              {canModify && message.type !== "file" && (
+                <button
+                  onClick={() => {
+                    setIsEditing(true);
+                    setEditContent(message.content);
+                  }}
+                  className="rounded-md p-1.5 text-crm-muted hover:bg-crm-body hover:text-crm-heading"
+                  title="Edit"
+                >
+                  <Edit3 className="h-4 w-4" />
+                </button>
+              )}
+
+              {/* Delete */}
+              {canModify && (
+                <button
+                  onClick={handleDelete}
+                  disabled={updating}
+                  className="rounded-md p-1.5 text-crm-danger hover:bg-crm-danger-soft"
+                  title="Delete"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Reactions List */}
@@ -268,72 +334,6 @@ export function MessageBubble({
           onRefresh={onRefresh}
         />
       </div>
-
-      {/* Floating Action Toolbar on hover */}
-      {!message.isDeleted && !isEditing && (
-        <div className={`absolute top-1/2 -translate-y-1/2 z-10 hidden group-hover:flex items-center gap-1 bg-crm-surface border border-crm-border rounded-lg p-1 shadow-dropdown transition-all animate-in fade-in slide-in-from-top-1 duration-150 ${
-          isSelf ? "right-full mr-2" : "left-full ml-2"
-        }`}>
-          {/* Reaction Picker Button */}
-          <div className="relative">
-            <button
-              onClick={() => setShowEmojiPicker((prev) => !prev)}
-              className="rounded-md p-1.5 text-crm-muted hover:bg-crm-body hover:text-crm-heading"
-              title="Add Reaction"
-            >
-              <Smile className="h-4 w-4" />
-            </button>
-            {showEmojiPicker && (
-              <div className="absolute bottom-full left-1/2 -translate-x-1/2 z-20 mb-2 flex gap-1 rounded-full border border-crm-border bg-crm-surface p-1 shadow-dropdown animate-in zoom-in duration-100">
-                {emojiOptions.map((emoji) => (
-                  <button
-                    key={emoji}
-                    onClick={() => handleReact(emoji)}
-                    className="h-7 w-7 text-sm hover:scale-125 transition-transform"
-                  >
-                    {emoji}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Reply */}
-          <button
-            onClick={() => onReply(message)}
-            className="rounded-md p-1.5 text-crm-muted hover:bg-crm-body hover:text-crm-heading"
-            title="Reply"
-          >
-            <CornerUpLeft className="h-4 w-4" />
-          </button>
-
-          {/* Edit */}
-          {canModify && message.type !== "file" && (
-            <button
-              onClick={() => {
-                setIsEditing(true);
-                setEditContent(message.content);
-              }}
-              className="rounded-md p-1.5 text-crm-muted hover:bg-crm-body hover:text-crm-heading"
-              title="Edit"
-            >
-              <Edit3 className="h-4 w-4" />
-            </button>
-          )}
-
-          {/* Delete */}
-          {canModify && (
-            <button
-              onClick={handleDelete}
-              disabled={updating}
-              className="rounded-md p-1.5 text-crm-danger hover:bg-crm-danger-soft"
-              title="Delete"
-            >
-              <Trash2 className="h-4 w-4" />
-            </button>
-          )}
-        </div>
-      )}
     </div>
   );
 }

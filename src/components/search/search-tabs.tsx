@@ -15,7 +15,7 @@ type SearchTabsProps = {
 
 export function SearchTabs({ activeTab, tabs, onChange }: SearchTabsProps) {
   return (
-    <div className="flex items-center gap-2 overflow-x-auto no-scrollbar -mx-6 px-6 sm:mx-0 sm:px-0 sm:flex-wrap">
+    <div className="flex items-center gap-2 overflow-x-auto no-scrollbar -mx-6 px-6 sm:mx-0 sm:px-0">
       {tabs.map((tab) => {
         const active = tab.value === activeTab;
 

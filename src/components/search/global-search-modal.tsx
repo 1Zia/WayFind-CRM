@@ -201,21 +201,23 @@ export function GlobalSearchModal({
         </div>
 
         {/* Tabs & Filters */}
-        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-gray-100 px-6 py-3.5 bg-gray-50/50">
-          <SearchTabs
-            activeTab={activeTab}
-            tabs={tabs}
-            onChange={(tab) => {
-              setActiveTab(tab);
-              setResponse({ groups: [], total: 0 });
-            }}
-          />
+        <div className="flex items-center justify-between gap-4 border-b border-gray-100 px-6 py-3 bg-gray-50/50">
+          <div className="flex-1 min-w-0">
+            <SearchTabs
+              activeTab={activeTab}
+              tabs={tabs}
+              onChange={(tab) => {
+                setActiveTab(tab);
+                setResponse({ groups: [], total: 0 });
+              }}
+            />
+          </div>
 
-          <div className="relative">
+          <div className="relative shrink-0">
             <button
               type="button"
               onClick={() => setShowDateFilters((current) => !current)}
-              className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-500 hover:bg-gray-50 shadow-theme-xs"
+              className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-500 hover:bg-gray-50 shadow-theme-xs whitespace-nowrap"
             >
               <Calendar className="h-3.5 w-3.5" />
               {dateFilter === "Anytime" ? "Filter by date" : dateFilter}
