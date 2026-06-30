@@ -5,9 +5,20 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import {
+  DataTable,
+  DataTableBody,
+  DataTableCell,
+  DataTableEmptyRow,
+  DataTableHead,
+  DataTableHeadCell,
+  DataTableRow,
+  DataTableWrapper,
+} from "@/components/shared/data-table-wrapper";
+import { EmptyState } from "@/components/shared/empty-state";
+import { LeadStatusBadge } from "@/components/leads/lead-status-badge";
 import { deleteLead } from "@/lib/actions/leads";
 import type { LeadStatus } from "@/lib/validations/lead";
-import { LeadStatusBadge } from "@/components/leads/lead-status-badge";
 
 type Lead = {
   id: string;
@@ -51,44 +62,44 @@ export function LeadTable({ leads, canDelete }: LeadTableProps) {
   }
 
   return (
-    <div className="overflow-hidden rounded-xl border bg-white">
-      <table className="w-full text-sm">
-        <thead className="border-b bg-zinc-50 text-left">
+    <DataTableWrapper>
+      <DataTable>
+        <DataTableHead>
           <tr>
-            <th className="px-4 py-3 font-medium">Lead</th>
-            <th className="px-4 py-3 font-medium">Company</th>
-            <th className="px-4 py-3 font-medium">Contact</th>
-            <th className="px-4 py-3 font-medium">Source</th>
-            <th className="px-4 py-3 font-medium">Status</th>
-            <th className="px-4 py-3 font-medium">Follow-up</th>
-            <th className="px-4 py-3 font-medium">Created</th>
-            <th className="px-4 py-3 font-medium">Actions</th>
+            <DataTableHeadCell>Lead</DataTableHeadCell>
+            <DataTableHeadCell>Company</DataTableHeadCell>
+            <DataTableHeadCell>Contact</DataTableHeadCell>
+            <DataTableHeadCell>Source</DataTableHeadCell>
+            <DataTableHeadCell>Status</DataTableHeadCell>
+            <DataTableHeadCell>Follow-up</DataTableHeadCell>
+            <DataTableHeadCell>Created</DataTableHeadCell>
+            <DataTableHeadCell>Actions</DataTableHeadCell>
           </tr>
-        </thead>
+        </DataTableHead>
 
-        <tbody>
+        <DataTableBody>
           {leads.map((lead) => (
-            <tr key={lead.id} className="border-b last:border-0">
-              <td className="px-4 py-3 font-medium">{lead.leadName}</td>
-              <td className="px-4 py-3">{lead.company ?? "-"}</td>
-              <td className="px-4 py-3">{lead.contact ?? "-"}</td>
-              <td className="px-4 py-3">{lead.source ?? "-"}</td>
-              <td className="px-4 py-3">
+            <DataTableRow key={lead.id}>
+              <DataTableCell className="font-medium">{lead.leadName}</DataTableCell>
+              <DataTableCell>{lead.company ?? "-"}</DataTableCell>
+              <DataTableCell>{lead.contact ?? "-"}</DataTableCell>
+              <DataTableCell>{lead.source ?? "-"}</DataTableCell>
+              <DataTableCell>
                 <LeadStatusBadge status={lead.status} />
-              </td>
-              <td className="px-4 py-3">{lead.followUpDate ?? "-"}</td>
-              <td className="px-4 py-3">{lead.createdAt.toLocaleString()}</td>
-              <td className="px-4 py-3">
+              </DataTableCell>
+              <DataTableCell>{lead.followUpDate ?? "-"}</DataTableCell>
+              <DataTableCell>{lead.createdAt.toLocaleString()}</DataTableCell>
+              <DataTableCell>
                 <div className="flex flex-wrap gap-3">
                   <Link
                     href={`/leads/${lead.id}`}
-                    className="text-purple-600 hover:underline"
+                    className="crm-action-link"
                   >
                     View
                   </Link>
                   <Link
                     href={`/leads/${lead.id}/edit`}
-                    className="text-purple-600 hover:underline"
+                    className="crm-action-link"
                   >
                     Edit
                   </Link>
@@ -97,28 +108,27 @@ export function LeadTable({ leads, canDelete }: LeadTableProps) {
                       type="button"
                       disabled={deletingId === lead.id}
                       onClick={() => handleDelete(lead.id)}
-                      className="text-red-600 hover:underline disabled:opacity-60"
+                      className="crm-action-link-danger"
                     >
                       {deletingId === lead.id ? "Deleting..." : "Delete"}
                     </button>
                   ) : null}
                 </div>
-              </td>
-            </tr>
+              </DataTableCell>
+            </DataTableRow>
           ))}
 
-          {leads.length === 0 && (
-            <tr>
-              <td colSpan={8} className="px-4 py-10 text-center text-zinc-500">
-                <div className="font-medium text-zinc-950">No leads yet.</div>
-                <div className="mt-1 text-sm">
-                  Leads will appear here as they enter the sales pipeline.
-                </div>
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-    </div>
+          {leads.length === 0 ? (
+            <DataTableEmptyRow colSpan={8}>
+              <EmptyState
+                compact
+                title="No leads yet"
+                description="Leads will appear here as they enter the sales pipeline."
+              />
+            </DataTableEmptyRow>
+          ) : null}
+        </DataTableBody>
+      </DataTable>
+    </DataTableWrapper>
   );
 }

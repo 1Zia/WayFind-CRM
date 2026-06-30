@@ -1,6 +1,18 @@
 import Link from "next/link";
 
 import {
+  DataTable,
+  DataTableBody,
+  DataTableCell,
+  DataTableEmptyRow,
+  DataTableHead,
+  DataTableHeadCell,
+  DataTableRow,
+  DataTableWrapper,
+} from "@/components/shared/data-table-wrapper";
+import { EmptyState } from "@/components/shared/empty-state";
+import { StatusBadge } from "@/components/shared/status-badge";
+import {
   formatLastSeen,
   formatPresenceStatus,
   getPresenceStatus,
@@ -30,86 +42,79 @@ const roleLabels: Record<User["role"], string> = {
 
 export function UserTable({ users }: UserTableProps) {
   return (
-    <div className="overflow-hidden rounded-xl border bg-white">
-      <table className="w-full text-sm">
-        <thead className="border-b bg-zinc-50 text-left">
+    <DataTableWrapper>
+      <DataTable>
+        <DataTableHead>
           <tr>
-            <th className="px-4 py-3 font-medium">User</th>
-            <th className="px-4 py-3 font-medium">Role</th>
-            <th className="px-4 py-3 font-medium">Account Status</th>
-            <th className="px-4 py-3 font-medium">Presence</th>
-            <th className="px-4 py-3 font-medium">Created</th>
-            <th className="px-4 py-3 font-medium">Action</th>
+            <DataTableHeadCell>User</DataTableHeadCell>
+            <DataTableHeadCell>Role</DataTableHeadCell>
+            <DataTableHeadCell>Account Status</DataTableHeadCell>
+            <DataTableHeadCell>Presence</DataTableHeadCell>
+            <DataTableHeadCell>Created</DataTableHeadCell>
+            <DataTableHeadCell>Action</DataTableHeadCell>
           </tr>
-        </thead>
+        </DataTableHead>
 
-        <tbody>
+        <DataTableBody>
           {users.map((user) => (
-            <tr key={user.id} className="border-b last:border-0">
-              <td className="px-4 py-3">
-                <div className="font-medium">{user.name}</div>
-                <div className="text-xs text-zinc-500">{user.email}</div>
-              </td>
-              <td className="px-4 py-3">
-                <RoleBadge role={user.role} />
-              </td>
-              <td className="px-4 py-3">
-                <StatusBadge status={user.status} />
-              </td>
-              <td className="px-4 py-3">
+            <DataTableRow key={user.id}>
+              <DataTableCell>
+                <div className="font-medium text-crm-heading">{user.name}</div>
+                <div className="text-xs text-crm-muted">{user.email}</div>
+              </DataTableCell>
+              <DataTableCell>
+                <StatusBadge tone="secondary">
+                  {roleLabels[user.role]}
+                </StatusBadge>
+              </DataTableCell>
+              <DataTableCell>
+                <AccountStatusBadge status={user.status} />
+              </DataTableCell>
+              <DataTableCell>
                 <PresenceBadge
                   lastSeenAt={user.lastSeenAt}
                   status={getPresenceStatus(user.lastSeenAt)}
                 />
-              </td>
-              <td className="px-4 py-3">{user.createdAt.toLocaleString()}</td>
-              <td className="px-4 py-3">
+              </DataTableCell>
+              <DataTableCell>{user.createdAt.toLocaleString()}</DataTableCell>
+              <DataTableCell>
                 <Link
                   href={`/team/users/${user.id}`}
-                  className="text-purple-600 hover:underline"
+                  className="crm-action-link"
                 >
                   View
                 </Link>
-              </td>
-            </tr>
+              </DataTableCell>
+            </DataTableRow>
           ))}
 
-          {users.length === 0 && (
-            <tr>
-              <td colSpan={6} className="px-4 py-10 text-center text-zinc-500">
-                <div className="font-medium text-zinc-950">No users yet.</div>
-                <div className="mt-1 text-sm">
-                  Team members will appear here after they sign in or sync.
-                </div>
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-    </div>
+          {users.length === 0 ? (
+            <DataTableEmptyRow colSpan={6}>
+              <EmptyState
+                compact
+                title="No users yet"
+                description="Team members will appear here after they sign in or sync."
+              />
+            </DataTableEmptyRow>
+          ) : null}
+        </DataTableBody>
+      </DataTable>
+    </DataTableWrapper>
   );
 }
 
-function RoleBadge({ role }: { role: User["role"] }) {
-  return (
-    <span className="rounded-full bg-purple-50 px-2 py-0.5 text-xs font-medium text-purple-700">
-      {roleLabels[role]}
-    </span>
-  );
-}
-
-function StatusBadge({ status }: { status: User["status"] }) {
-  const classes =
+function AccountStatusBadge({ status }: { status: User["status"] }) {
+  const tone =
     status === "active"
-      ? "bg-emerald-50 text-emerald-700"
-      : status === "inactive" || status === "disabled"
-        ? "bg-zinc-100 text-zinc-700"
-        : "bg-red-50 text-red-700";
+      ? "success"
+      : status === "suspended"
+        ? "danger"
+        : "default";
 
   return (
-    <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${classes}`}>
+    <StatusBadge tone={tone}>
       {status === "inactive" ? "disabled" : status}
-    </span>
+    </StatusBadge>
   );
 }
 
@@ -120,21 +125,13 @@ function PresenceBadge({
   lastSeenAt: Date | null;
   status: PresenceStatus;
 }) {
-  const classes =
-    status === "online"
-      ? "bg-emerald-50 text-emerald-700"
-      : status === "away"
-        ? "bg-amber-50 text-amber-700"
-        : "bg-zinc-100 text-zinc-700";
+  const tone =
+    status === "online" ? "success" : status === "away" ? "warning" : "default";
 
   return (
     <div className="space-y-1">
-      <span
-        className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${classes}`}
-      >
-        {formatPresenceStatus(status)}
-      </span>
-      <div className="text-xs text-zinc-500">{formatLastSeen(lastSeenAt)}</div>
+      <StatusBadge tone={tone}>{formatPresenceStatus(status)}</StatusBadge>
+      <div className="text-xs text-crm-muted">{formatLastSeen(lastSeenAt)}</div>
     </div>
   );
 }

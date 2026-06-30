@@ -1,5 +1,8 @@
+import { MetricCard } from "@/components/shared/metric-card";
+import { PageHeader } from "@/components/shared/page-header";
 import { UserTable } from "@/components/team/user-table";
 import { getUsers } from "@/lib/actions/users";
+import { Users } from "lucide-react";
 
 export default async function TeamUsersPage() {
   let users;
@@ -12,16 +15,13 @@ export default async function TeamUsersPage() {
 
   return (
     <>
-      <div className="mb-6">
-        <h1 className="text-2xl font-semibold tracking-tight">Team Users</h1>
-        <p className="mt-1 text-sm text-zinc-500">
-          Manage team members, roles, and account status.
-        </p>
-      </div>
+      <PageHeader
+        title="Team Users"
+        description="Manage team members, roles, and account status."
+      />
 
-      <div className="mb-4 rounded-xl border bg-white p-4">
-        <p className="text-sm text-zinc-500">Total Users</p>
-        <p className="mt-1 text-2xl font-semibold">{users.length}</p>
+      <div className="mb-4 max-w-xs">
+        <MetricCard title="Total Users" value={users.length} icon={Users} tone="secondary" />
       </div>
 
       <UserTable users={users} />
@@ -31,11 +31,11 @@ export default async function TeamUsersPage() {
 
 function ForbiddenMessage() {
   return (
-    <div className="rounded-xl border bg-white p-6">
-      <h1 className="text-2xl font-semibold tracking-tight">
+    <div className="crm-card p-6">
+      <h1 className="text-2xl font-semibold tracking-tight text-crm-heading">
         Team access required
       </h1>
-      <p className="mt-2 text-sm text-zinc-500">
+      <p className="mt-2 text-sm text-crm-muted">
         Only super admins can manage users.
       </p>
     </div>

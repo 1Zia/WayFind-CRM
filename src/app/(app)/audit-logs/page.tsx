@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/shared/page-header";
 import { AuditLogTable } from "@/components/audit-logs/audit-log-table";
 import { getAuditLogs } from "@/lib/actions/audit-logs";
 
@@ -12,12 +13,10 @@ export default async function AuditLogsPage() {
 
   return (
     <>
-      <div className="mb-6">
-        <h1 className="text-2xl font-semibold tracking-tight">Audit Logs</h1>
-        <p className="mt-1 text-sm text-zinc-500">
-          Track user activity and system changes.
-        </p>
-      </div>
+      <PageHeader
+        title="Audit Logs"
+        description="Track user activity and system changes."
+      />
 
       <AuditLogTable logs={logs} />
     </>
@@ -26,7 +25,7 @@ export default async function AuditLogsPage() {
 
 function ForbiddenMessage() {
   return (
-    <div className="rounded-xl border bg-white p-6">
+    <div className="crm-card p-6">
       <h1 className="text-2xl font-semibold tracking-tight">
         Audit logs access required
       </h1>

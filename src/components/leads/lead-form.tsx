@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { LiquidButton } from "@/components/ui/button";
 import { createLead, updateLead } from "@/lib/actions/leads";
 import type { LeadInput } from "@/lib/validations/lead";
 
@@ -141,12 +142,12 @@ export function LeadForm({ lead }: LeadFormProps) {
         />
       </div>
 
-      <button
-        disabled={loading}
-        className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-60"
-      >
-        {loading ? "Saving..." : lead ? "Update Lead" : "Create Lead"}
-      </button>
+      <LiquidButton
+          type="submit"
+          disabled={loading}
+        >
+          {loading ? "Saving..." : lead ? "Update Lead" : "Create Lead"}
+        </LiquidButton>
     </form>
   );
 }

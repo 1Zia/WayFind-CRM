@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import type { users } from "@/db/schema";
 
 import { PresenceHeartbeat } from "@/components/presence/presence-heartbeat";
@@ -31,19 +34,28 @@ export function AppShell({
   unreadNotifications: number;
   user: User;
 }) {
-  return (
-    <div className="flex min-h-screen bg-zinc-50">
-      <PresenceHeartbeat />
-      <AppSidebar user={user} />
+  const [mobileOpen, setMobileOpen] = useState(false);
 
-      <div className="flex min-h-screen flex-1 flex-col">
+  return (
+    <div className="flex h-screen overflow-hidden bg-crm-body">
+      <PresenceHeartbeat />
+      <AppSidebar
+        user={user}
+        mobileOpen={mobileOpen}
+        onMobileClose={() => setMobileOpen(false)}
+      />
+
+      <div className="relative flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
         <AppHeader
           latestNotifications={latestNotifications}
           unreadNotifications={unreadNotifications}
           user={user}
+          onToggleSidebar={() => setMobileOpen(true)}
         />
 
-        <main className="flex-1 p-6">{children}</main>
+        <main className="flex-1 p-4 md:p-6 lg:p-8">
+          <div className="mx-auto w-full max-w-[1400px]">{children}</div>
+        </main>
       </div>
     </div>
   );

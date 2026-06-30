@@ -137,7 +137,11 @@ export function canAccessRoute(user: User, href: string) {
     return user.role === "super_admin";
   }
 
-  if (href.startsWith("/notifications") || href.startsWith("/settings")) {
+  if (
+    href.startsWith("/notifications") ||
+    href.startsWith("/settings") ||
+    href.startsWith("/chat")
+  ) {
     return true;
   }
 

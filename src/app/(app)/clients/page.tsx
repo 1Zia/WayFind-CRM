@@ -1,9 +1,23 @@
 import Link from "next/link";
 
+import {
+  DataTable,
+  DataTableBody,
+  DataTableCell,
+  DataTableEmptyRow,
+  DataTableHead,
+  DataTableHeadCell,
+  DataTableRow,
+  DataTableWrapper,
+} from "@/components/shared/data-table-wrapper";
+import { EmptyState } from "@/components/shared/empty-state";
+import { PageHeader } from "@/components/shared/page-header";
+import { StatusBadge } from "@/components/shared/status-badge";
 import { ForbiddenState } from "@/components/shared/forbidden-state";
 import { getClients } from "@/lib/actions/clients";
 import { requireUser } from "@/lib/auth";
 import { hasPermission } from "@/lib/permissions";
+import { LiquidButton } from "@/components/ui/button";
 
 export default async function ClientsPage() {
   let clients;
@@ -17,72 +31,69 @@ export default async function ClientsPage() {
 
   return (
     <>
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Clients</h1>
-          <p className="mt-1 text-sm text-zinc-500">
-            Manage company clients and customer records.
-          </p>
-        </div>
+      <PageHeader
+        title="Clients"
+        description="Manage company clients and customer records."
+        action={
+          hasPermission(user, "clients:create") ? (
+            <LiquidButton href="/clients/new" size="default">
+              New Client
+            </LiquidButton>
+          ) : null
+        }
+      />
 
-        {hasPermission(user, "clients:create") ? (
-          <Link
-            href="/clients/new"
-            className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
-          >
-            New Client
-          </Link>
-        ) : null}
-      </div>
-
-      <div className="overflow-hidden rounded-xl border bg-white">
-        <table className="w-full text-sm">
-          <thead className="border-b bg-zinc-50 text-left">
+      <DataTableWrapper>
+        <DataTable>
+          <DataTableHead>
             <tr>
-              <th className="px-4 py-3 font-medium">Company</th>
-              <th className="px-4 py-3 font-medium">Contact</th>
-              <th className="px-4 py-3 font-medium">Email</th>
-              <th className="px-4 py-3 font-medium">Status</th>
-              <th className="px-4 py-3 font-medium">Action</th>
+              <DataTableHeadCell>Company</DataTableHeadCell>
+              <DataTableHeadCell>Contact</DataTableHeadCell>
+              <DataTableHeadCell>Email</DataTableHeadCell>
+              <DataTableHeadCell>Status</DataTableHeadCell>
+              <DataTableHeadCell>Action</DataTableHeadCell>
             </tr>
-          </thead>
+          </DataTableHead>
 
-          <tbody>
+          <DataTableBody>
             {clients.map((client) => (
-              <tr key={client.id} className="border-b last:border-0">
-                <td className="px-4 py-3 font-medium">{client.companyName}</td>
-                <td className="px-4 py-3">{client.contactPerson || "-"}</td>
-                <td className="px-4 py-3">{client.email || "-"}</td>
-                <td className="px-4 py-3 capitalize">{client.status}</td>
-                <td className="px-4 py-3">
+              <DataTableRow key={client.id}>
+                <DataTableCell className="font-medium">
+                  {client.companyName}
+                </DataTableCell>
+                <DataTableCell>{client.contactPerson || "-"}</DataTableCell>
+                <DataTableCell>{client.email || "-"}</DataTableCell>
+                <DataTableCell>
+                  <StatusBadge tone="primary">{client.status}</StatusBadge>
+                </DataTableCell>
+                <DataTableCell>
                   <Link
                     href={`/clients/${client.id}`}
-                    className="text-purple-600 hover:underline"
+                    className="crm-action-link"
                   >
                     View
                   </Link>
-                </td>
-              </tr>
+                </DataTableCell>
+              </DataTableRow>
             ))}
 
-            {clients.length === 0 && (
-              <tr>
-                <td
-                  colSpan={5}
-                  className="px-4 py-10 text-center text-zinc-500"
-                >
-                  <div className="font-medium text-zinc-950">
-                    No clients yet.
-                  </div>
-                  <div className="mt-1 text-sm">
-                    Client records will appear here after they are created.
-                  </div>
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+            {clients.length === 0 ? (
+              <DataTableEmptyRow colSpan={5}>
+                <EmptyState
+                  compact
+                  title="No clients yet"
+                  description="Client records will appear here after they are created."
+                  action={
+                    hasPermission(user, "clients:create")
+                      ? { label: "New Client", href: "/clients/new" }
+                      : undefined
+                  }
+                />
+              </DataTableEmptyRow>
+            ) : null}
+          </DataTableBody>
+        </DataTable>
+      </DataTableWrapper>
     </>
   );
 }

@@ -19,6 +19,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { createPortal } from "react-dom";
 
 import {
   globalSearch,
@@ -55,6 +56,11 @@ export function GlobalSearchModal({
     total: 0,
   });
   const [isPending, startTransition] = useTransition();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const flatResults = useMemo(
     () => response.groups.flatMap((group) => group.results),
@@ -113,14 +119,14 @@ export function GlobalSearchModal({
 
     const timeout = window.setTimeout(() => {
       startTransition(async () => {
-        const results = await globalSearch(trimmedQuery, activeTab);
+        const results = await globalSearch(trimmedQuery, activeTab, dateFilter);
         setResponse(results);
         rememberSearch(trimmedQuery);
       });
     }, 300);
 
     return () => window.clearTimeout(timeout);
-  }, [activeTab, open, query]);
+  }, [activeTab, open, query, dateFilter]);
 
   function rememberSearch(value: string) {
     const next = [
@@ -148,48 +154,54 @@ export function GlobalSearchModal({
     router.push(firstResult.href);
   }
 
-  if (!open) {
+  if (!open || !mounted) {
     return null;
   }
 
   const isSearching = query.trim().length >= 2;
 
-  return (
+  return createPortal(
     <div
       role="dialog"
       aria-modal="true"
       aria-label="Global search"
-      className="fixed inset-0 z-[80] bg-white text-zinc-950"
+      className="fixed inset-0 z-[9999] flex items-start justify-center p-4 sm:p-10 md:p-20 overflow-y-auto"
     >
-      <button
-        type="button"
-        aria-label="Close search"
+      {/* Backdrop */}
+      <div
+        className="fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity duration-300"
         onClick={handleClose}
-        className="absolute right-6 top-5 rounded-full p-2 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-950"
-      >
-        <X className="h-5 w-5" />
-      </button>
+      />
 
-      <div className="flex h-full flex-col">
-        <div className="px-7 pt-8">
-          <div className="flex items-center gap-3 border-b border-zinc-300 pb-3 pr-14">
-            <Search className="h-7 w-7 text-zinc-400" />
-            <input
-              ref={inputRef}
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") {
-                  handleResultShortcut();
-                }
-              }}
-              placeholder="Search Everything ..."
-              className="w-full border-0 bg-transparent text-4xl font-medium text-zinc-700 outline-none placeholder:text-zinc-500"
-            />
-          </div>
+      {/* Dialog Card */}
+      <div className="relative z-10 w-full max-w-3xl rounded-2xl border border-gray-200 bg-white shadow-theme-xl flex flex-col max-h-[85vh] overflow-hidden pointer-events-auto">
+        {/* Search Input Area */}
+        <div className="px-6 py-5 flex items-center gap-3 border-b border-gray-200">
+          <Search className="h-6 w-6 text-brand-500 shrink-0" />
+          <input
+            ref={inputRef}
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                handleResultShortcut();
+              }
+            }}
+            placeholder="Search or type command..."
+            className="w-full border-0 bg-transparent text-lg font-medium text-crm-heading outline-none placeholder:text-gray-400"
+          />
+          <button
+            type="button"
+            aria-label="Close search"
+            onClick={handleClose}
+            className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-700"
+          >
+            <X className="h-5 w-5" />
+          </button>
         </div>
 
-        <div className="flex flex-wrap items-center justify-between gap-4 px-7 py-5">
+        {/* Tabs & Filters */}
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-gray-100 px-6 py-3.5 bg-gray-50/50">
           <SearchTabs
             activeTab={activeTab}
             tabs={tabs}
@@ -203,14 +215,14 @@ export function GlobalSearchModal({
             <button
               type="button"
               onClick={() => setShowDateFilters((current) => !current)}
-              className="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium text-zinc-600 hover:bg-zinc-50"
+              className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-500 hover:bg-gray-50 shadow-theme-xs"
             >
-              <Calendar className="h-4 w-4" />
+              <Calendar className="h-3.5 w-3.5" />
               {dateFilter === "Anytime" ? "Filter by date" : dateFilter}
             </button>
 
             {showDateFilters ? (
-              <div className="absolute right-0 top-full z-[90] mt-2 w-40 overflow-hidden rounded-lg border bg-white shadow-lg">
+              <div className="absolute right-0 top-full z-[90] mt-1.5 w-40 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-theme-lg">
                 {dateFilters.map((filter) => (
                   <button
                     key={filter}
@@ -219,7 +231,7 @@ export function GlobalSearchModal({
                       setDateFilter(filter);
                       setShowDateFilters(false);
                     }}
-                    className="block w-full px-3 py-2 text-left text-sm text-zinc-700 hover:bg-zinc-50"
+                    className="block w-full px-3 py-2 text-left text-xs font-medium text-gray-700 hover:bg-gray-50"
                   >
                     {filter}
                   </button>
@@ -229,7 +241,8 @@ export function GlobalSearchModal({
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-7 pb-8">
+        {/* Search Results Area */}
+        <div className="flex-1 overflow-y-auto px-6 py-6 custom-scrollbar">
           {!isSearching ? (
             <SearchEmptyState
               recentSearches={recentSearches}
@@ -238,33 +251,33 @@ export function GlobalSearchModal({
               onClose={handleClose}
             />
           ) : (
-            <div className="mx-auto max-w-5xl">
-              <div className="mb-4 flex items-center justify-between text-sm text-zinc-500">
+            <div className="w-full">
+              <div className="mb-4 flex items-center justify-between text-xs text-gray-400">
                 <span>
                   {isPending
                     ? "Searching..."
                     : `${response.total} result${
                         response.total === 1 ? "" : "s"
-                      } found`}
+                    } found`}
                 </span>
-                <span className="hidden rounded-md border px-2 py-1 text-xs text-zinc-500 sm:inline-flex">
+                <span className="hidden rounded-md border border-gray-200 bg-gray-50 px-2 py-0.5 text-[10px] text-gray-500 sm:inline-flex shadow-theme-xs">
                   Press Enter to open first result
                 </span>
               </div>
 
               {isPending ? (
-                <div className="flex items-center justify-center py-16 text-sm text-zinc-500">
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Searching WayFind
+                <div className="flex items-center justify-center py-16 text-sm text-gray-400">
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin text-brand-500" />
+                  Searching WayFind...
                 </div>
               ) : response.groups.length > 0 ? (
-                <div className="space-y-7">
+                <div className="space-y-6">
                   {response.groups.map((group) => (
                     <section key={group.label}>
-                      <h2 className="mb-2 text-sm font-semibold text-zinc-500">
+                      <h2 className="mb-2 text-xs font-bold uppercase tracking-wider text-gray-400">
                         {group.label}
                       </h2>
-                      <div className="rounded-xl border bg-white p-2">
+                      <div className="rounded-xl border border-gray-100 bg-white p-1.5 shadow-theme-xs space-y-1">
                         {group.results.map((result) => (
                           <SearchResultItem
                             key={`${result.type}-${result.id}`}
@@ -277,11 +290,11 @@ export function GlobalSearchModal({
                   ))}
                 </div>
               ) : (
-                <div className="rounded-xl border border-dashed p-10 text-center">
-                  <h2 className="text-base font-semibold text-zinc-950">
+                <div className="rounded-xl border border-dashed border-gray-200 bg-gray-50/50 p-10 text-center">
+                  <h2 className="text-sm font-semibold text-gray-900">
                     No results found
                   </h2>
-                  <p className="mt-2 text-sm text-zinc-500">
+                  <p className="mt-1 text-xs text-gray-400">
                     Try a client name, lead, project, task, document, invoice,
                     or teammate.
                   </p>
@@ -291,7 +304,8 @@ export function GlobalSearchModal({
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
@@ -307,101 +321,101 @@ function SearchEmptyState({
   onClose: () => void;
 }) {
   return (
-    <div className="pt-16">
-      <div className="grid gap-10 lg:grid-cols-4">
+    <div className="pt-6">
+      <div className="grid gap-8 lg:grid-cols-4">
         <section>
-          <div className="mb-7 flex items-center gap-2 text-lg font-medium text-zinc-800">
-            <User className="h-5 w-5 text-orange-400" />
+          <div className="mb-5 flex items-center gap-2 text-base font-semibold text-gray-900">
+            <User className="h-4.5 w-4.5 text-orange-400" />
             Related to me
           </div>
-          <div className="space-y-5 text-sm text-zinc-600">
+          <div className="space-y-3.5 text-sm text-gray-600">
             <QuickLink
               href="/tasks"
-              icon={<CheckSquare className="h-4 w-4" />}
+              icon={<CheckSquare className="h-4 w-4 text-gray-400" />}
               label="I'm assigned to"
               onClose={onClose}
             />
             <QuickLink
               href="/documents"
-              icon={<FileText className="h-4 w-4" />}
+              icon={<FileText className="h-4 w-4 text-gray-400" />}
               label="My files"
               onClose={onClose}
             />
             <QuickLink
               href="/projects"
-              icon={<Briefcase className="h-4 w-4" />}
+              icon={<Briefcase className="h-4 w-4 text-gray-400" />}
               label="Project boards"
               onClose={onClose}
             />
             <div className="flex items-center gap-3">
-              <AtSign className="h-4 w-4 text-zinc-700" />
+              <AtSign className="h-4 w-4 text-gray-400" />
               <span>I was mentioned</span>
             </div>
             <div className="flex items-center gap-3">
-              <Archive className="h-4 w-4 text-zinc-700" />
+              <Archive className="h-4 w-4 text-gray-400" />
               <span>Archived records</span>
             </div>
           </div>
         </section>
 
         <section>
-          <div className="mb-7 flex items-center gap-2 text-lg font-medium text-zinc-800">
-            <Star className="h-5 w-5 fill-emerald-500 text-emerald-500" />
+          <div className="mb-5 flex items-center gap-2 text-base font-semibold text-gray-900">
+            <Star className="h-4.5 w-4.5 fill-success-500 text-success-500" />
             Saved Searches
           </div>
-          <p className="max-w-xs text-sm leading-6 text-zinc-500">
-            <Lightbulb className="mr-2 inline h-4 w-4" />
+          <p className="max-w-xs text-xs leading-5 text-gray-400">
+            <Lightbulb className="mr-1.5 inline h-4 w-4 text-amber-500" />
             Save searches for quick access. Saved searches will be available in
             a later release.
           </p>
         </section>
 
         <section>
-          <div className="mb-7 flex items-center gap-2 text-lg font-medium text-zinc-800">
-            <Clock className="h-5 w-5 text-blue-500" />
+          <div className="mb-5 flex items-center gap-2 text-base font-semibold text-gray-900">
+            <Clock className="h-4.5 w-4.5 text-brand-500" />
             Recent Searches
           </div>
           {recentSearches.length > 0 ? (
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               {recentSearches.map((recent) => (
                 <button
                   key={recent}
                   type="button"
                   onClick={() => onPickRecent(recent)}
-                  className="block text-left text-sm text-zinc-600 hover:text-zinc-950"
+                  className="block text-left text-sm text-gray-600 hover:text-brand-500 font-medium"
                 >
                   {recent}
                 </button>
               ))}
             </div>
           ) : (
-            <p className="max-w-xs text-sm leading-6 text-zinc-500">
-              <Lightbulb className="mr-2 inline h-4 w-4" />
+            <p className="max-w-xs text-xs leading-5 text-gray-400">
+              <Lightbulb className="mr-1.5 inline h-4 w-4 text-amber-500" />
               Your recent searches will appear here after you search.
             </p>
           )}
         </section>
 
         <section>
-          <div className="mb-7 flex items-center gap-2 text-lg font-medium text-zinc-800">
-            <Sparkles className="h-5 w-5 text-purple-500" />
-            Try the new quick search
+          <div className="mb-5 flex items-center gap-2 text-base font-semibold text-gray-900">
+            <Sparkles className="h-4.5 w-4.5 text-purple-500" />
+            Quick Search
           </div>
-          <p className="max-w-sm text-sm leading-6 text-zinc-600">
+          <p className="max-w-sm text-xs leading-5 text-gray-400">
             Find records faster with keyboard-friendly search across your CRM
             workspace.
           </p>
-          <div className="mt-5 flex items-center gap-4">
+          <div className="mt-4 flex items-center gap-3">
             <button
               type="button"
               onClick={onFocusSearch}
-              className="rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white"
+              className="rounded-lg bg-brand-500 px-3.5 py-2 text-xs font-semibold text-white hover:bg-brand-600 shadow-theme-xs"
             >
-              Open quick search
+              Open search box
             </button>
-            <span className="text-sm text-zinc-500">Ctrl + K</span>
+            <span className="text-xs text-gray-400 font-medium">Ctrl + K</span>
           </div>
-          <div className="mt-7 border-t pt-5 text-sm text-zinc-500">
+          <div className="mt-5 border-t border-gray-100 pt-4 text-xs text-gray-400">
             AI-powered answers are planned for a later release.
           </div>
         </section>

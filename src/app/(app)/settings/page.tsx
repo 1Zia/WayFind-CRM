@@ -64,7 +64,7 @@ export default async function SettingsPage() {
             {isSuperAdmin ? (
               <Link
                 href="/team/users"
-                className="inline-flex rounded-lg bg-black px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
+                className="crm-btn-primary"
               >
                 Manage team roles
               </Link>
@@ -85,7 +85,7 @@ export default async function SettingsPage() {
             {isSuperAdmin ? (
               <Link
                 href="/team/users"
-                className="inline-flex rounded-lg bg-black px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
+                className="crm-btn-primary"
               >
                 Manage user statuses
               </Link>

@@ -1,12 +1,85 @@
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-html,
-body {
-  height: 100%;
+/* --- Liquid Button Animations --- */
+@keyframes liquidFlow {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
 }
 
-body {
-  @apply bg-white text-slate-900;
+@layer base {
+  html,
+  body {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-crm-body font-outfit text-crm-heading antialiased;
+    color: #101828;
+  }
+}
+
+@layer components {
+  .crm-card {
+    @apply rounded-2xl border border-crm-border bg-crm-surface shadow-theme-xs;
+  }
+
+  .crm-input {
+    @apply mt-1.5 w-full rounded-lg border border-gray-200 bg-transparent px-4 py-2.5 text-sm text-crm-heading outline-none transition-colors placeholder:text-gray-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10;
+  }
+
+  .crm-label {
+    @apply text-sm font-semibold text-crm-heading;
+  }
+
+  .crm-table-head {
+    @apply border-b border-crm-border bg-gray-50 text-left text-xs font-semibold uppercase tracking-wide text-gray-500;
+  }
+
+  .crm-table-cell {
+    @apply px-6 py-4 align-middle text-sm text-crm-heading;
+  }
+
+  .crm-table-row {
+    @apply border-b border-crm-border/40 transition-colors last:border-0 hover:bg-gray-50/50;
+  }
+
+  .crm-action-link {
+    @apply text-sm font-medium text-crm-primary hover:text-brand-600 hover:underline;
+  }
+
+  .crm-action-link-danger {
+    @apply text-sm font-medium text-crm-danger hover:underline disabled:opacity-60;
+  }
+
+  .crm-btn-primary {
+    @apply inline-flex items-center justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-600 disabled:opacity-60;
+  }
+
+  .crm-btn-secondary {
+    @apply inline-flex items-center justify-center rounded-lg border border-gray-200 bg-crm-surface px-4 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-60;
+  }
+
+  .crm-btn-ghost {
+    @apply inline-flex items-center justify-center rounded-lg px-3 py-2.5 text-sm font-medium text-gray-500 transition-colors hover:bg-gray-50 hover:text-gray-90;
+  }
+}
+
+@layer utilities {
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .no-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
 }

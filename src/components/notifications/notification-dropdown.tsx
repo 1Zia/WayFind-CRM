@@ -84,21 +84,21 @@ export function NotificationDropdown({
         aria-expanded={open}
         aria-label="Open notifications"
         onClick={() => setOpen((current) => !current)}
-        className="relative rounded-lg border p-2 text-zinc-600 hover:bg-zinc-50"
+        className="relative rounded-lg border border-crm-border bg-crm-surface p-2 text-crm-muted transition-colors hover:bg-[#f6f9fc] hover:text-crm-heading"
       >
         <Bell className="h-4 w-4" />
         {unreadCount > 0 ? (
-          <span className="absolute -right-2 -top-2 min-w-5 rounded-full bg-purple-600 px-1.5 py-0.5 text-center text-xs font-medium text-white">
+          <span className="absolute -right-2 -top-2 min-w-5 rounded-full bg-crm-secondary px-1.5 py-0.5 text-center text-xs font-medium text-white">
             {unreadCount > 99 ? "99+" : unreadCount}
           </span>
         ) : null}
       </button>
 
       {open ? (
-        <div className="absolute right-0 top-full z-50 mt-3 w-[360px] overflow-hidden rounded-xl border bg-white shadow-lg">
+        <div className="absolute right-0 top-full z-50 mt-3 w-[360px] overflow-hidden rounded-card border border-crm-border-soft bg-crm-surface shadow-dropdown">
           <div className="flex items-center justify-between gap-3 border-b px-4 py-3">
             <div>
-              <h2 className="text-sm font-semibold text-zinc-950">
+              <h2 className="text-sm font-semibold text-crm-heading">
                 Notifications
               </h2>
               <p className="mt-0.5 text-xs text-zinc-500">
@@ -112,7 +112,7 @@ export function NotificationDropdown({
                 type="button"
                 disabled={loading}
                 onClick={handleMarkAllRead}
-                className="text-xs font-medium text-purple-600 hover:underline disabled:opacity-60"
+                className="crm-action-link text-xs disabled:opacity-60"
               >
                 {loading ? "Saving..." : "Mark all as read"}
               </button>
@@ -127,7 +127,7 @@ export function NotificationDropdown({
                     key={notification.id}
                     href={`/notifications/${notification.id}`}
                     onClick={() => setOpen(false)}
-                    className="block px-4 py-3 hover:bg-zinc-50"
+                    className="block px-4 py-3 transition-colors hover:bg-[#f6f9fc]"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
@@ -164,7 +164,7 @@ export function NotificationDropdown({
             <Link
               href="/notifications"
               onClick={() => setOpen(false)}
-              className="block text-center text-sm font-medium text-purple-600 hover:underline"
+              className="crm-action-link block text-center text-sm"
             >
               View all notifications
             </Link>

@@ -1,10 +1,24 @@
 import Link from "next/link";
 
+import {
+  DataTable,
+  DataTableBody,
+  DataTableCell,
+  DataTableEmptyRow,
+  DataTableHead,
+  DataTableHeadCell,
+  DataTableRow,
+  DataTableWrapper,
+} from "@/components/shared/data-table-wrapper";
+import { EmptyState } from "@/components/shared/empty-state";
+import { PageHeader } from "@/components/shared/page-header";
+import { StatusBadge } from "@/components/shared/status-badge";
 import { ForbiddenState } from "@/components/shared/forbidden-state";
 import { getClients } from "@/lib/actions/clients";
 import { getProjects } from "@/lib/actions/projects";
 import { requireUser } from "@/lib/auth";
 import { hasPermission } from "@/lib/permissions";
+import { LiquidButton } from "@/components/ui/button";
 
 export default async function ProjectsPage() {
   let data;
@@ -22,80 +36,77 @@ export default async function ProjectsPage() {
 
   return (
     <>
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Projects</h1>
-          <p className="mt-1 text-sm text-zinc-500">
-            Manage projects and work for your clients.
-          </p>
-        </div>
+      <PageHeader
+        title="Projects"
+        description="Manage projects and work for your clients."
+        action={
+          hasPermission(user, "projects:create") ? (
+            <LiquidButton href="/projects/new" size="default">
+              New Project
+            </LiquidButton>
+          ) : null
+        }
+      />
 
-        {hasPermission(user, "projects:create") ? (
-          <Link
-            href="/projects/new"
-            className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
-          >
-            New Project
-          </Link>
-        ) : null}
-      </div>
-
-      <div className="overflow-hidden rounded-xl border bg-white">
-        <table className="w-full text-sm">
-          <thead className="border-b bg-zinc-50 text-left">
+      <DataTableWrapper>
+        <DataTable>
+          <DataTableHead>
             <tr>
-              <th className="px-4 py-3 font-medium">Name</th>
-              <th className="px-4 py-3 font-medium">Client</th>
-              <th className="px-4 py-3 font-medium">Budget</th>
-              <th className="px-4 py-3 font-medium">Start Date</th>
-              <th className="px-4 py-3 font-medium">Deadline</th>
-              <th className="px-4 py-3 font-medium">Status</th>
-              <th className="px-4 py-3 font-medium">Action</th>
+              <DataTableHeadCell>Name</DataTableHeadCell>
+              <DataTableHeadCell>Client</DataTableHeadCell>
+              <DataTableHeadCell>Budget</DataTableHeadCell>
+              <DataTableHeadCell>Start Date</DataTableHeadCell>
+              <DataTableHeadCell>Deadline</DataTableHeadCell>
+              <DataTableHeadCell>Status</DataTableHeadCell>
+              <DataTableHeadCell>Action</DataTableHeadCell>
             </tr>
-          </thead>
+          </DataTableHead>
 
-          <tbody>
+          <DataTableBody>
             {projects.map((project) => (
-              <tr key={project.id} className="border-b last:border-0">
-                <td className="px-4 py-3 font-medium">{project.name}</td>
-                <td className="px-4 py-3">
+              <DataTableRow key={project.id}>
+                <DataTableCell className="font-medium">
+                  {project.name}
+                </DataTableCell>
+                <DataTableCell>
                   {project.clientId
                     ? clientNames.get(project.clientId) ?? project.clientId
                     : "-"}
-                </td>
-                <td className="px-4 py-3">{project.budget ?? "-"}</td>
-                <td className="px-4 py-3">{project.startDate ?? "-"}</td>
-                <td className="px-4 py-3">{project.deadline ?? "-"}</td>
-                <td className="px-4 py-3 capitalize">{project.status}</td>
-                <td className="px-4 py-3">
+                </DataTableCell>
+                <DataTableCell>{project.budget ?? "-"}</DataTableCell>
+                <DataTableCell>{project.startDate ?? "-"}</DataTableCell>
+                <DataTableCell>{project.deadline ?? "-"}</DataTableCell>
+                <DataTableCell>
+                  <StatusBadge tone="info">{project.status}</StatusBadge>
+                </DataTableCell>
+                <DataTableCell>
                   <Link
                     href={`/projects/${project.id}`}
-                    className="text-purple-600 hover:underline"
+                    className="crm-action-link"
                   >
                     View
                   </Link>
-                </td>
-              </tr>
+                </DataTableCell>
+              </DataTableRow>
             ))}
 
-            {projects.length === 0 && (
-              <tr>
-                <td
-                  colSpan={7}
-                  className="px-4 py-10 text-center text-zinc-500"
-                >
-                  <div className="font-medium text-zinc-950">
-                    No projects yet.
-                  </div>
-                  <div className="mt-1 text-sm">
-                    Project work will appear here after it is created.
-                  </div>
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+            {projects.length === 0 ? (
+              <DataTableEmptyRow colSpan={7}>
+                <EmptyState
+                  compact
+                  title="No projects yet"
+                  description="Project work will appear here after it is created."
+                  action={
+                    hasPermission(user, "projects:create")
+                      ? { label: "New Project", href: "/projects/new" }
+                      : undefined
+                  }
+                />
+              </DataTableEmptyRow>
+            ) : null}
+          </DataTableBody>
+        </DataTable>
+      </DataTableWrapper>
     </>
   );
 }

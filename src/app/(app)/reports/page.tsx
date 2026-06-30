@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/shared/page-header";
 import { BusinessOverviewReport } from "@/components/reports/business-overview-report";
 import { FinanceReport } from "@/components/reports/finance-report";
 import { LeadReport } from "@/components/reports/lead-report";
@@ -16,13 +17,10 @@ export default async function ReportsPage() {
 
   return (
     <>
-      <div className="mb-6">
-        <h1 className="text-2xl font-semibold tracking-tight">Reports</h1>
-        <p className="mt-1 text-sm text-zinc-500">
-          Analyze company performance, projects, tasks, leads, and financial
-          activity.
-        </p>
-      </div>
+      <PageHeader
+        title="Reports"
+        description="Analyze company performance, projects, tasks, leads, and financial activity."
+      />
 
       <div className="space-y-8">
         <BusinessOverviewReport report={reports.overview} />
@@ -37,7 +35,7 @@ export default async function ReportsPage() {
 
 function ForbiddenMessage() {
   return (
-    <div className="rounded-xl border bg-white p-6">
+    <div className="crm-card p-6">
       <h1 className="text-2xl font-semibold tracking-tight">
         Reports access required
       </h1>

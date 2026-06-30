@@ -88,7 +88,7 @@ export function TaskGroupTable({
   return (
     <div className="overflow-x-auto">
       <table className="min-w-[1120px] w-full text-sm">
-        <thead className="border-b bg-zinc-50 text-left text-xs text-zinc-500">
+        <thead className="crm-table-head text-left text-xs">
           <tr>
             {visibleColumnSet.has("actions") ? (
               <th className="w-36 px-3 py-3 font-medium">Actions</th>

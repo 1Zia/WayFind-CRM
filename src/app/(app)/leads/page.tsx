@@ -2,10 +2,12 @@ import Link from "next/link";
 
 import { LeadPipeline } from "@/components/leads/lead-pipeline";
 import { LeadTable } from "@/components/leads/lead-table";
+import { PageHeader } from "@/components/shared/page-header";
 import { ForbiddenState } from "@/components/shared/forbidden-state";
 import { getLeads } from "@/lib/actions/leads";
 import { requireUser } from "@/lib/auth";
 import { hasPermission } from "@/lib/permissions";
+import { LiquidButton } from "@/components/ui/button";
 
 type LeadsPageProps = {
   searchParams?: {
@@ -32,39 +34,33 @@ export default async function LeadsPage({ searchParams }: LeadsPageProps) {
 
   return (
     <>
-      <div className="mb-6 flex items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Leads</h1>
-          <p className="mt-1 text-sm text-zinc-500">
-            Track potential clients through the sales pipeline.
-          </p>
-        </div>
-
-        {hasPermission(user, "leads:create") ? (
-          <Link
-            href="/leads/new"
-            className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
-          >
-            New Lead
-          </Link>
-        ) : null}
-      </div>
+      <PageHeader
+        title="Leads"
+        description="Track potential clients through the sales pipeline."
+        action={
+          hasPermission(user, "leads:create") ? (
+            <LiquidButton href="/leads/new" size="default">
+              New Lead
+            </LiquidButton>
+          ) : null
+        }
+      />
 
       <div className="mb-6">
         <LeadPipeline leads={leads} />
       </div>
 
-      <form className="mb-4 grid gap-3 rounded-xl border bg-white p-4 md:grid-cols-[1fr_180px_auto]">
+      <form className="crm-card mb-4 grid gap-3 p-4 md:grid-cols-[1fr_180px_auto]">
         <input
           name="search"
           defaultValue={searchParams?.search ?? ""}
-          className="rounded-lg border px-3 py-2 text-sm"
+          className="crm-input mt-0"
           placeholder="Search leads..."
         />
         <select
           name="status"
           defaultValue={searchParams?.status ?? "all"}
-          className="rounded-lg border px-3 py-2 text-sm"
+          className="crm-input mt-0"
         >
           <option value="all">All statuses</option>
           <option value="new_lead">New Lead</option>
@@ -73,7 +69,7 @@ export default async function LeadsPage({ searchParams }: LeadsPageProps) {
           <option value="converted">Converted</option>
           <option value="lost">Lost</option>
         </select>
-        <button className="rounded-lg border px-4 py-2 text-sm font-medium hover:bg-zinc-50">
+        <button type="submit" className="crm-btn-secondary">
           Filter
         </button>
       </form>

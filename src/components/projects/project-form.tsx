@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
+import { LiquidButton } from "@/components/ui/button";
 import type { ProjectInput } from "@/lib/validations/project";
 import { createProject, updateProject } from "@/lib/actions/projects";
 
@@ -153,12 +154,12 @@ export function ProjectForm({ project, clients = [] }: ProjectFormProps) {
         </select>
       </div>
 
-      <button
-        disabled={loading}
-        className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-60"
-      >
-        {loading ? "Saving..." : project ? "Update Project" : "Create Project"}
-      </button>
+      <LiquidButton
+          type="submit"
+          disabled={loading}
+        >
+          {loading ? "Saving..." : project ? "Update Project" : "Create Project"}
+        </LiquidButton>
     </form>
   );
 }

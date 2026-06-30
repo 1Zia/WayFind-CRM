@@ -1,41 +1,22 @@
-import Link from "next/link";
-import type { users } from "@/db/schema";
+"use client";
 
-import { navigationItems } from "@/config/navigation";
-import { canAccessRoute } from "@/lib/permissions";
+import type { users } from "@/db/schema";
+import { SidebarNav } from "./sidebar-nav";
 
 type User = typeof users.$inferSelect;
 
-export function AppSidebar({ user }: { user: User }) {
-  const visibleItems = navigationItems.filter((item) =>
-    canAccessRoute(user, item.href),
-  );
+type AppSidebarProps = {
+  user: User;
+  mobileOpen: boolean;
+  onMobileClose: () => void;
+};
 
+export function AppSidebar({ user, mobileOpen, onMobileClose }: AppSidebarProps) {
   return (
-    <aside className="hidden min-h-screen w-64 border-r bg-white px-4 py-6 lg:block">
-      <div className="mb-8">
-        <h1 className="text-xl font-bold tracking-tight text-zinc-950">
-          WayFind
-        </h1>
-        <p className="text-sm text-zinc-500">CRM / ERP</p>
-      </div>
-
-      <nav className="space-y-1">
-        {visibleItems.map((item) => {
-          const Icon = item.icon;
-
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-100 hover:text-zinc-950"
-            >
-              <Icon className="h-4 w-4" />
-              {item.title}
-            </Link>
-          );
-        })}
-      </nav>
-    </aside>
+    <SidebarNav
+      user={user}
+      mobileOpen={mobileOpen}
+      onMobileClose={onMobileClose}
+    />
   );
 }

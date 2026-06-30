@@ -1,3 +1,14 @@
+import {
+  Bell,
+  Briefcase,
+  CheckSquare,
+  DollarSign,
+  Target,
+  TrendingDown,
+  TrendingUp,
+  Users,
+  Zap,
+} from "lucide-react";
 import Link from "next/link";
 
 import { EmptyState } from "@/components/shared/empty-state";
@@ -5,6 +16,7 @@ import { MetricCard } from "@/components/shared/metric-card";
 import { PageHeader } from "@/components/shared/page-header";
 import { SectionCard } from "@/components/shared/section-card";
 import { StatusBadge } from "@/components/shared/status-badge";
+import { LiquidButton } from "@/components/ui/button";
 import { getDashboardStats } from "@/lib/actions/dashboard";
 
 function formatMoney(value: number) {
@@ -55,36 +67,72 @@ export default async function DashboardPage() {
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {stats.permissions.canViewClients ? (
-          <MetricCard title="Total Clients" value={stats.totalClients} />
+          <MetricCard
+            title="Total Clients"
+            value={stats.totalClients}
+            icon={Users}
+            tone="primary"
+          />
         ) : null}
         {stats.permissions.canViewLeads ? (
-          <MetricCard title="Total Leads" value={stats.totalLeads} />
+          <MetricCard
+            title="Total Leads"
+            value={stats.totalLeads}
+            icon={Target}
+            tone="secondary"
+          />
         ) : null}
         {stats.permissions.canViewProjects ? (
-          <MetricCard title="Active Projects" value={stats.activeProjects} />
+          <MetricCard
+            title="Active Projects"
+            value={stats.activeProjects}
+            icon={Briefcase}
+            tone="info"
+          />
         ) : null}
         {stats.permissions.canViewTasks ? (
-          <MetricCard title="Pending Tasks" value={stats.pendingTasks} />
+          <MetricCard
+            title="Pending Tasks"
+            value={stats.pendingTasks}
+            icon={CheckSquare}
+            tone="warning"
+          />
         ) : null}
         {stats.permissions.canViewTasks ? (
           <MetricCard
             title="Active Sprint Tasks"
             value={stats.activeSprintTasks}
+            icon={Zap}
+            tone="secondary"
           />
         ) : null}
         {stats.permissions.canViewFinance ? (
           <>
-            <MetricCard title="Revenue" value={formatMoney(stats.revenue)} />
-            <MetricCard title="Expenses" value={formatMoney(stats.expenses)} />
+            <MetricCard
+              title="Revenue"
+              value={formatMoney(stats.revenue)}
+              icon={TrendingUp}
+              tone="success"
+            />
+            <MetricCard
+              title="Expenses"
+              value={formatMoney(stats.expenses)}
+              icon={TrendingDown}
+              tone="danger"
+            />
             <MetricCard
               title="Profit / Loss"
               value={formatMoney(stats.profitLoss)}
+              icon={DollarSign}
+              tone={stats.profitLoss >= 0 ? "success" : "danger"}
             />
           </>
         ) : null}
         <MetricCard
           title="Unread Notifications"
           value={stats.unreadNotifications}
+          icon={Bell}
+          tone="info"
         />
       </div>
 
@@ -94,15 +142,14 @@ export default async function DashboardPage() {
             title="Quick Actions"
             description="Jump straight into common CRM work."
           >
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-4">
               {quickActions.map((action) => (
-                <Link
+                <LiquidButton
                   key={action.href}
                   href={action.href}
-                  className="rounded-lg border px-3 py-2 text-sm font-medium hover:bg-zinc-50"
                 >
                   {action.label}
-                </Link>
+                </LiquidButton>
               ))}
             </div>
           </SectionCard>
@@ -113,11 +160,13 @@ export default async function DashboardPage() {
         {stats.permissions.canViewAuditLogs ? (
           <SectionCard title="Recent Activity">
             {stats.recentActivity.length > 0 ? (
-              <div className="divide-y">
+              <div className="divide-y divide-crm-border-soft">
                 {stats.recentActivity.map((item) => (
                   <div key={item.id} className="py-3 first:pt-0 last:pb-0">
-                    <p className="text-sm font-medium">{item.description}</p>
-                    <p className="mt-1 text-xs text-zinc-500">
+                    <p className="text-sm font-medium text-crm-heading">
+                      {item.description}
+                    </p>
+                    <p className="mt-1 text-xs text-crm-muted">
                       {item.entityType} - {item.action} -{" "}
                       {formatDate(item.createdAt)}
                     </p>
@@ -126,6 +175,7 @@ export default async function DashboardPage() {
               </div>
             ) : (
               <EmptyState
+                compact
                 title="No recent activity"
                 description="Audit activity will appear here as records change."
               />
@@ -247,12 +297,26 @@ function EmployeeDashboard({ stats }: { stats: EmployeeDashboardStats }) {
         <MetricCard
           title="Pending Assigned to Me"
           value={stats.summary.pendingAssigned}
+          icon={CheckSquare}
+          tone="primary"
         />
-        <MetricCard title="Overdue" value={stats.summary.overdue} />
-        <MetricCard title="Due Today" value={stats.summary.dueToday} />
+        <MetricCard
+          title="Overdue"
+          value={stats.summary.overdue}
+          icon={TrendingDown}
+          tone="danger"
+        />
+        <MetricCard
+          title="Due Today"
+          value={stats.summary.dueToday}
+          icon={Zap}
+          tone="warning"
+        />
         <MetricCard
           title="Completed This Week"
           value={stats.summary.completedThisWeek}
+          icon={TrendingUp}
+          tone="success"
         />
       </div>
 
@@ -272,13 +336,13 @@ function EmployeeDashboard({ stats }: { stats: EmployeeDashboardStats }) {
                   <span className="font-medium">{stats.activeSprint.name}</span>
                   <span className="text-zinc-500">{activeSprintProgress}%</span>
                 </div>
-                <div className="mt-2 h-2 rounded-full bg-zinc-100">
+                <div className="mt-2 h-2 rounded-full bg-crm-border-soft">
                   <div
-                    className="h-2 rounded-full bg-purple-600"
+                    className="h-2 rounded-full bg-crm-secondary"
                     style={{ width: `${activeSprintProgress}%` }}
                   />
                 </div>
-                <p className="mt-2 text-xs text-zinc-500">
+                <p className="mt-2 text-xs text-crm-muted">
                   {formatDate(stats.activeSprint.startDate)} -{" "}
                   {formatDate(stats.activeSprint.endDate)}
                 </p>
@@ -306,20 +370,20 @@ function EmployeeDashboard({ stats }: { stats: EmployeeDashboardStats }) {
         </SectionCard>
 
         <SectionCard title="Quick Actions">
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-3">
             {[
               { href: "/tasks", label: "View My Tasks" },
               { href: "/documents/new", label: "Upload Document" },
               { href: "/notifications", label: "Open Notifications" },
               { href: "/settings", label: "Update Profile / Settings" },
             ].map((action) => (
-              <Link
+              <LiquidButton
                 key={action.href}
                 href={action.href}
-                className="rounded-lg border px-3 py-2 text-sm font-medium hover:bg-zinc-50"
+                variant="primary"
               >
                 {action.label}
-              </Link>
+              </LiquidButton>
             ))}
           </div>
         </SectionCard>
@@ -418,7 +482,7 @@ function TaskLink({
     >
       <div className="min-w-0">
         <p className="truncate font-medium">{task.title}</p>
-        <p className="text-xs text-zinc-500">
+        <p className="text-xs text-crm-muted">
           {task.projectName} - Due {formatDate(task.dueDate)}
         </p>
       </div>

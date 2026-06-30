@@ -32,6 +32,15 @@ team users, and reports.
 - Team / users management
 - Reports
 - Role-based navigation and UI restrictions
+- Chat module with direct messaging, group chats, reactions, thread replies, and attachment uploads
+
+## Chat Module
+
+WayFind CRM includes a professional internal chat feature for team messaging.
+- **Lightweight Polling**: Realtime messaging is powered by lightweight client-side polling every 5 seconds (no WebSockets or paid real-time services required). Polling automatically halts when the browser tab is hidden or blurred.
+- **Attachments**: Supports image previews and document downloads. File attachments require `UPLOADTHING_TOKEN` to be configured. If the token is missing, the attachment upload button is disabled/hidden and text chat remains fully functional.
+- **Reactions & Replies**: Users can react to messages with emojis and reply directly to messages to create thread previews.
+
 
 ## Environment Variables
 

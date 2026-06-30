@@ -1,9 +1,12 @@
 "use server";
 
-import { and, desc, eq, ilike, or } from "drizzle-orm";
+import { and, desc, eq, ilike, or, inArray, gte } from "drizzle-orm";
 
 import { db } from "@/db";
 import {
+  chatConversations,
+  chatMessages,
+  chatParticipants,
   clients,
   documents,
   expenses,
@@ -27,7 +30,8 @@ export type SearchScope =
   | "finance"
   | "files"
   | "people"
-  | "docs";
+  | "docs"
+  | "chat";
 
 export type SearchResultType =
   | "client"
@@ -36,7 +40,8 @@ export type SearchResultType =
   | "task"
   | "document"
   | "finance"
-  | "person";
+  | "person"
+  | "chat";
 
 export type SearchResult = {
   id: string;
@@ -108,12 +113,25 @@ function isExpenseCategory(
 export async function globalSearch(
   rawQuery: string,
   scope: SearchScope = "all",
+  dateFilter: string = "Anytime",
 ): Promise<GlobalSearchResponse> {
   const user = await requireUser();
   const query = rawQuery.trim();
 
   if (query.length < 2) {
     return { groups: [], total: 0 };
+  }
+
+  let dateLimit: Date | null = null;
+  if (dateFilter === "Today") {
+    dateLimit = new Date();
+    dateLimit.setHours(0, 0, 0, 0);
+  } else if (dateFilter === "This week") {
+    dateLimit = new Date();
+    dateLimit.setDate(dateLimit.getDate() - 7);
+  } else if (dateFilter === "This month") {
+    dateLimit = new Date();
+    dateLimit.setMonth(dateLimit.getMonth() - 1);
   }
 
   const pattern = `%${query}%`;
@@ -129,6 +147,18 @@ export async function globalSearch(
   const canViewPeople = user.role === "super_admin";
 
   if (canViewClients && isScope(scope, ["clients"])) {
+    const clientConditions = [
+      or(
+        ilike(clients.companyName, pattern),
+        ilike(clients.contactPerson, pattern),
+        ilike(clients.email, pattern),
+        ilike(clients.phone, pattern),
+      ),
+    ];
+    if (dateLimit) {
+      clientConditions.push(gte(clients.createdAt, dateLimit));
+    }
+
     const rows = await withSafeFallback(
       "search.clients",
       () =>
@@ -142,14 +172,7 @@ export async function globalSearch(
             createdAt: clients.createdAt,
           })
           .from(clients)
-          .where(
-            or(
-              ilike(clients.companyName, pattern),
-              ilike(clients.contactPerson, pattern),
-              ilike(clients.email, pattern),
-              ilike(clients.phone, pattern),
-            ),
-          )
+          .where(and(...clientConditions))
           .orderBy(desc(clients.createdAt))
           .limit(LIMIT_PER_GROUP),
       [],
@@ -172,6 +195,19 @@ export async function globalSearch(
   }
 
   if (canViewLeads && isScope(scope, ["leads"])) {
+    const leadConditions = [
+      or(
+        ilike(leads.leadName, pattern),
+        ilike(leads.company, pattern),
+        ilike(leads.email, pattern),
+        ilike(leads.phone, pattern),
+        ilike(leads.source, pattern),
+      ),
+    ];
+    if (dateLimit) {
+      leadConditions.push(gte(leads.createdAt, dateLimit));
+    }
+
     const rows = await withSafeFallback(
       "search.leads",
       () =>
@@ -187,15 +223,7 @@ export async function globalSearch(
             createdAt: leads.createdAt,
           })
           .from(leads)
-          .where(
-            or(
-              ilike(leads.leadName, pattern),
-              ilike(leads.company, pattern),
-              ilike(leads.email, pattern),
-              ilike(leads.phone, pattern),
-              ilike(leads.source, pattern),
-            ),
-          )
+          .where(and(...leadConditions))
           .orderBy(desc(leads.createdAt))
           .limit(LIMIT_PER_GROUP),
       [],
@@ -220,6 +248,16 @@ export async function globalSearch(
   }
 
   if (canViewProjects && isScope(scope, ["projects"])) {
+    const projectConditions = [
+      or(
+        ilike(projects.name, pattern),
+        ilike(projects.description, pattern),
+      ),
+    ];
+    if (dateLimit) {
+      projectConditions.push(gte(projects.createdAt, dateLimit));
+    }
+
     const rows = await withSafeFallback(
       "search.projects",
       () =>
@@ -234,12 +272,7 @@ export async function globalSearch(
             createdAt: projects.createdAt,
           })
           .from(projects)
-          .where(
-            or(
-              ilike(projects.name, pattern),
-              ilike(projects.description, pattern),
-            ),
-          )
+          .where(and(...projectConditions))
           .orderBy(desc(projects.createdAt))
           .limit(LIMIT_PER_GROUP),
       [],
@@ -265,11 +298,18 @@ export async function globalSearch(
   }
 
   if ((canViewAllTasks || canViewAssignedTasks) && isScope(scope, ["tasks"])) {
-    const searchClause = or(
-      ilike(tasks.title, pattern),
-      ilike(tasks.description, pattern),
-    );
-    const ownerClause = canViewAllTasks ? undefined : eq(tasks.assignedTo, user.id);
+    const taskConditions = [
+      or(
+        ilike(tasks.title, pattern),
+        ilike(tasks.description, pattern),
+      ),
+    ];
+    if (!canViewAllTasks) {
+      taskConditions.push(eq(tasks.assignedTo, user.id));
+    }
+    if (dateLimit) {
+      taskConditions.push(gte(tasks.createdAt, dateLimit));
+    }
 
     const rows = await withSafeFallback(
       "search.tasks",
@@ -285,7 +325,7 @@ export async function globalSearch(
             createdAt: tasks.createdAt,
           })
           .from(tasks)
-          .where(ownerClause ? and(searchClause, ownerClause) : searchClause)
+          .where(and(...taskConditions))
           .orderBy(desc(tasks.createdAt))
           .limit(LIMIT_PER_GROUP),
       [],
@@ -308,6 +348,17 @@ export async function globalSearch(
   }
 
   if (canViewDocuments && isScope(scope, ["files", "docs"])) {
+    const docConditions = [
+      or(
+        ilike(documents.fileName, pattern),
+        ilike(documents.fileType, pattern),
+        ilike(documents.description, pattern),
+      ),
+    ];
+    if (dateLimit) {
+      docConditions.push(gte(documents.createdAt, dateLimit));
+    }
+
     const rows = await withSafeFallback(
       "search.documents",
       () =>
@@ -321,13 +372,7 @@ export async function globalSearch(
             createdAt: documents.createdAt,
           })
           .from(documents)
-          .where(
-            or(
-              ilike(documents.fileName, pattern),
-              ilike(documents.fileType, pattern),
-              ilike(documents.description, pattern),
-            ),
-          )
+          .where(and(...docConditions))
           .orderBy(desc(documents.createdAt))
           .limit(LIMIT_PER_GROUP),
       [],
@@ -361,6 +406,30 @@ export async function globalSearch(
         )
       : or(ilike(expenses.title, pattern), ilike(expenses.notes, pattern));
 
+    const invoiceConditions = [
+      or(
+        ilike(invoices.invoiceNumber, pattern),
+        ilike(invoices.notes, pattern),
+      ),
+    ];
+    if (dateLimit) {
+      invoiceConditions.push(gte(invoices.createdAt, dateLimit));
+    }
+
+    const incomeConditions = [
+      ilike(income.notes, pattern),
+    ];
+    if (dateLimit) {
+      incomeConditions.push(gte(income.createdAt, dateLimit));
+    }
+
+    const expenseConditions = [
+      expenseSearchClause,
+    ];
+    if (dateLimit) {
+      expenseConditions.push(gte(expenses.createdAt, dateLimit));
+    }
+
     const [invoiceRows, incomeRows, expenseRows] = await Promise.all([
       withSafeFallback(
         "search.finance.invoices",
@@ -376,12 +445,7 @@ export async function globalSearch(
               createdAt: invoices.createdAt,
             })
             .from(invoices)
-            .where(
-              or(
-                ilike(invoices.invoiceNumber, pattern),
-                ilike(invoices.notes, pattern),
-              ),
-            )
+            .where(and(...invoiceConditions))
             .orderBy(desc(invoices.createdAt))
             .limit(3),
         [],
@@ -399,7 +463,7 @@ export async function globalSearch(
               createdAt: income.createdAt,
             })
             .from(income)
-            .where(ilike(income.notes, pattern))
+            .where(and(...incomeConditions))
             .orderBy(desc(income.createdAt))
             .limit(3),
         [],
@@ -418,7 +482,7 @@ export async function globalSearch(
               createdAt: expenses.createdAt,
             })
             .from(expenses)
-            .where(expenseSearchClause)
+            .where(and(...expenseConditions))
             .orderBy(desc(expenses.createdAt))
             .limit(3),
         [],
@@ -466,6 +530,13 @@ export async function globalSearch(
   }
 
   if (canViewPeople && isScope(scope, ["people"])) {
+    const userConditions = [
+      or(ilike(users.name, pattern), ilike(users.email, pattern)),
+    ];
+    if (dateLimit) {
+      userConditions.push(gte(users.createdAt, dateLimit));
+    }
+
     const rows = await withSafeFallback(
       "search.people",
       () =>
@@ -479,7 +550,7 @@ export async function globalSearch(
             createdAt: users.createdAt,
           })
           .from(users)
-          .where(or(ilike(users.name, pattern), ilike(users.email, pattern)))
+          .where(and(...userConditions))
           .orderBy(desc(users.createdAt))
           .limit(LIMIT_PER_GROUP),
       [],
@@ -499,6 +570,69 @@ export async function globalSearch(
         href: `/team/users/${row.id}`,
       })),
     });
+  }
+
+  if (isScope(scope, ["chat"])) {
+    const userParticipations = await withSafeFallback(
+      "search.chat.participations",
+      () =>
+        db
+          .select({ conversationId: chatParticipants.conversationId })
+          .from(chatParticipants)
+          .where(eq(chatParticipants.userId, user.id)),
+      [],
+    );
+
+    if (userParticipations.length > 0) {
+      const userConvIds = userParticipations.map((p) => p.conversationId);
+
+      const chatConditions = [
+        inArray(chatMessages.conversationId, userConvIds),
+        ilike(chatMessages.content, pattern),
+        eq(chatMessages.isDeleted, false),
+      ];
+      if (dateLimit) {
+        chatConditions.push(gte(chatMessages.createdAt, dateLimit));
+      }
+
+      const msgRows = await withSafeFallback(
+        "search.chat.messages",
+        () =>
+          db
+            .select({
+              id: chatMessages.id,
+              content: chatMessages.content,
+              createdAt: chatMessages.createdAt,
+              senderName: users.name,
+              conversationId: chatConversations.id,
+              conversationName: chatConversations.name,
+              conversationType: chatConversations.type,
+            })
+            .from(chatMessages)
+            .innerJoin(chatConversations, eq(chatConversations.id, chatMessages.conversationId))
+            .leftJoin(users, eq(users.id, chatMessages.senderId))
+            .where(and(...chatConditions))
+            .orderBy(desc(chatMessages.createdAt))
+            .limit(LIMIT_PER_GROUP),
+        [],
+      );
+
+      if (msgRows.length > 0) {
+        groups.push({
+          type: "chat",
+          label: "Chat Messages",
+          results: msgRows.map((row) => ({
+            id: row.id,
+            type: "chat",
+            title: row.conversationType === "direct" ? `Chat with ${row.senderName}` : `Group: ${row.conversationName || "Unnamed"}`,
+            subtitle: `${row.senderName}: ${row.content}`,
+            badge: "Chat",
+            metadata: formatDate(row.createdAt),
+            href: `/chat?id=${row.conversationId}`,
+          })),
+        });
+      }
+    }
   }
 
   const nonEmptyGroups = groups.filter((group) => group.results.length > 0);

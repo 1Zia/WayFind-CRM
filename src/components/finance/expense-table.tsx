@@ -37,9 +37,9 @@ export function ExpenseTable({ expenses, users = [] }: ExpenseTableProps) {
   const userNames = new Map(users.map((user) => [user.id, user.name]));
 
   return (
-    <div className="overflow-hidden rounded-xl border bg-white">
+    <div className="crm-card overflow-hidden">
       <table className="w-full text-sm">
-        <thead className="border-b bg-zinc-50 text-left">
+        <thead className="crm-table-head text-left">
           <tr>
             <th className="px-4 py-3 font-medium">Title</th>
             <th className="px-4 py-3 font-medium">Category</th>
@@ -52,19 +52,19 @@ export function ExpenseTable({ expenses, users = [] }: ExpenseTableProps) {
 
         <tbody>
           {expenses.map((expense) => (
-            <tr key={expense.id} className="border-b last:border-0">
-              <td className="px-4 py-3 font-medium">{expense.title}</td>
-              <td className="px-4 py-3 capitalize">
+            <tr key={expense.id} className="crm-table-row">
+              <td className="crm-table-cell font-medium">{expense.title}</td>
+              <td className="crm-table-cell capitalize">
                 {expense.category.replace("_", " ")}
               </td>
-              <td className="px-4 py-3">{formatMoney(expense.amount)}</td>
-              <td className="px-4 py-3">{expense.date}</td>
-              <td className="px-4 py-3">
+              <td className="crm-table-cell">{formatMoney(expense.amount)}</td>
+              <td className="crm-table-cell">{expense.date}</td>
+              <td className="crm-table-cell">
                 {expense.approvedBy
                   ? userNames.get(expense.approvedBy) ?? expense.approvedBy
                   : "-"}
               </td>
-              <td className="px-4 py-3">{expense.notes ?? "-"}</td>
+              <td className="crm-table-cell">{expense.notes ?? "-"}</td>
             </tr>
           ))}
 

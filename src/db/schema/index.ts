@@ -8,3 +8,5 @@ export * from "./documents";
 export * from "./notifications";
 export * from "./leads";
 export * from "./sprints";
+export * from "./chat";
+

@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { ForbiddenState } from "@/components/shared/forbidden-state";
+import { PageHeader } from "@/components/shared/page-header";
 import { TaskBoard } from "@/components/tasks/task-board";
 import { getTaskBoardData } from "@/lib/actions/tasks";
 
@@ -69,15 +70,13 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Tasks</h1>
-        <p className="mt-1 text-sm text-zinc-500">
-          Plan sprint work, manage assignments, and track delivery.
-        </p>
-      </div>
+      <PageHeader
+        title="Tasks"
+        description="Plan sprint work, manage assignments, and track delivery."
+      />
 
-      <div className="border-b">
-        <div className="flex flex-wrap gap-5">
+      <div className="border-b border-crm-border-soft">
+        <div className="flex flex-wrap gap-1">
           {views.map((view) => {
             const active = activeView === view.value;
 
@@ -87,8 +86,8 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
                 href={getViewHref(view.value, searchParams)}
                 className={
                   active
-                    ? "border-b-2 border-blue-600 px-1 pb-3 text-sm font-medium text-zinc-950"
-                    : "px-1 pb-3 text-sm font-medium text-zinc-500 hover:text-zinc-950"
+                    ? "border-b-2 border-crm-primary px-4 pb-3 text-sm font-semibold text-crm-primary"
+                    : "px-4 pb-3 text-sm font-medium text-crm-muted transition-colors hover:text-crm-heading"
                 }
               >
                 {view.label}

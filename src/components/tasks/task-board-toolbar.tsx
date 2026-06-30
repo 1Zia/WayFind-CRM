@@ -16,6 +16,7 @@ import { toast } from "sonner";
 
 import { createSprint } from "@/lib/actions/sprints";
 import type { TaskColumnKey } from "@/components/tasks/task-group-table";
+import { Button, LiquidButton } from "@/components/ui/button";
 
 type Option = {
   id: string;
@@ -146,28 +147,28 @@ export function TaskBoardToolbar({
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-3 border-b pb-4">
+    <div className="crm-card mb-6 flex flex-wrap items-center gap-3 p-4">
       {canCreateTask ? (
-        <Link
-          href="/tasks/new"
-          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-        >
-          New task
-        </Link>
+        <Button asChild variant="cool">
+          <Link href="/tasks/new">
+            New task
+          </Link>
+        </Button>
       ) : null}
 
       {canCreateSprint ? (
-        <button
+        <LiquidButton
           type="button"
           disabled={creatingSprint}
           onClick={handleCreateSprint}
-          className="rounded-lg border px-4 py-2 text-sm font-medium hover:bg-zinc-50 disabled:opacity-60"
+          size="default"
+          className="disabled:opacity-60 font-semibold"
         >
           {creatingSprint ? "Creating..." : "Create sprint"}
-        </button>
+        </LiquidButton>
       ) : null}
 
-      <label className="flex min-w-56 items-center gap-2 rounded-lg border px-3 py-2 text-sm text-zinc-600">
+      <label className="flex min-w-56 items-center gap-2 rounded-lg border border-crm-border bg-crm-surface px-3 py-2 text-sm text-crm-muted">
         <Search className="h-4 w-4" />
         <input
           defaultValue={searchParams.get("search") ?? ""}
@@ -184,7 +185,7 @@ export function TaskBoardToolbar({
       <select
         value={searchParams.get("sort") ?? "newest"}
         onChange={(event) => updateParam("sort", event.target.value)}
-        className="rounded-lg border px-3 py-2 text-sm text-zinc-600"
+        className="crm-input mt-0 w-auto py-2"
       >
         <option value="newest">Newest first</option>
         <option value="oldest">Oldest first</option>
@@ -200,7 +201,7 @@ export function TaskBoardToolbar({
       <select
         value={searchParams.get("group") ?? "sprint"}
         onChange={(event) => updateParam("group", event.target.value)}
-        className="rounded-lg border px-3 py-2 text-sm text-zinc-600"
+        className="crm-input mt-0 w-auto py-2"
       >
         <option value="sprint">Group by sprint</option>
         <option value="status">Group by status</option>

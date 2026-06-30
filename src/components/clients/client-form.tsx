@@ -4,8 +4,10 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
+import { FormCard } from "@/components/shared/form-card";
 import type { ClientInput } from "@/lib/validations/client";
 import { createClient, updateClient } from "@/lib/actions/clients";
+import { LiquidButton } from "@/components/ui/button";
 
 type ClientFormProps = {
   client?: ClientInput & {
@@ -61,80 +63,89 @@ export function ClientForm({ client }: ClientFormProps) {
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="max-w-2xl space-y-5 rounded-xl border bg-white p-6"
+    <FormCard
+      title={client ? "Edit Client" : "New Client"}
+      description="Keep client contact details accurate for projects and billing."
     >
-      <div>
-        <label className="text-sm font-medium">Company Name</label>
-        <input
-          value={form.companyName}
-          onChange={(e) => updateField("companyName", e.target.value)}
-          className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-purple-500"
-          placeholder="Acme Corporation"
-        />
-      </div>
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <div>
+          <label className="crm-label">Company Name</label>
+          <input
+            value={form.companyName}
+            onChange={(e) => updateField("companyName", e.target.value)}
+            className="crm-input"
+            placeholder="Acme Corporation"
+          />
+        </div>
 
-      <div>
-        <label className="text-sm font-medium">Contact Person</label>
-        <input
-          value={form.contactPerson}
-          onChange={(e) => updateField("contactPerson", e.target.value)}
-          className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
-          placeholder="Ahmed Khan"
-        />
-      </div>
+        <div>
+          <label className="crm-label">Contact Person</label>
+          <input
+            value={form.contactPerson}
+            onChange={(e) => updateField("contactPerson", e.target.value)}
+            className="crm-input"
+            placeholder="Ahmed Khan"
+          />
+        </div>
 
-      <div>
-        <label className="text-sm font-medium">Email</label>
-        <input
-          value={form.email}
-          onChange={(e) => updateField("email", e.target.value)}
-          className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
-          placeholder="client@example.com"
-        />
-      </div>
+        <div>
+          <label className="crm-label">Email</label>
+          <input
+            value={form.email}
+            onChange={(e) => updateField("email", e.target.value)}
+            className="crm-input"
+            placeholder="client@example.com"
+          />
+        </div>
 
-      <div>
-        <label className="text-sm font-medium">Phone</label>
-        <input
-          value={form.phone}
-          onChange={(e) => updateField("phone", e.target.value)}
-          className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
-          placeholder="+92..."
-        />
-      </div>
+        <div>
+          <label className="crm-label">Phone</label>
+          <input
+            value={form.phone}
+            onChange={(e) => updateField("phone", e.target.value)}
+            className="crm-input"
+            placeholder="+92..."
+          />
+        </div>
 
-      <div>
-        <label className="text-sm font-medium">Status</label>
-        <select
-          value={form.status}
-          onChange={(e) => updateField("status", e.target.value)}
-          className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
-        >
-          <option value="prospect">Prospect</option>
-          <option value="active">Active</option>
-          <option value="inactive">Inactive</option>
-          <option value="archived">Archived</option>
-        </select>
-      </div>
+        <div>
+          <label className="crm-label">Address</label>
+          <input
+            value={form.address}
+            onChange={(e) => updateField("address", e.target.value)}
+            className="crm-input"
+            placeholder="Business address"
+          />
+        </div>
 
-      <div>
-        <label className="text-sm font-medium">Notes</label>
-        <textarea
-          value={form.notes}
-          onChange={(e) => updateField("notes", e.target.value)}
-          className="mt-1 min-h-28 w-full rounded-lg border px-3 py-2 text-sm"
-          placeholder="Client notes..."
-        />
-      </div>
+        <div>
+          <label className="crm-label">Status</label>
+          <select
+            value={form.status}
+            onChange={(e) => updateField("status", e.target.value)}
+            className="crm-input"
+          >
+            <option value="prospect">Prospect</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+            <option value="archived">Archived</option>
+          </select>
+        </div>
 
-      <button
-        disabled={loading}
-        className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-60"
-      >
-        {loading ? "Saving..." : client ? "Update Client" : "Create Client"}
-      </button>
-    </form>
+        <div>
+          <label className="crm-label">Notes</label>
+          <textarea
+            value={form.notes}
+            onChange={(e) => updateField("notes", e.target.value)}
+            className="crm-input min-h-28"
+            placeholder="Client notes..."
+          />
+        </div>
+
+        <LiquidButton type="submit" disabled={loading}>
+          {loading ? "Saving..." : client ? "Update Client" : "Create Client"}
+        </LiquidButton>
+      </form>
+    </FormCard>
   );
 }

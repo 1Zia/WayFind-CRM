@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { PageHeader } from "@/components/shared/page-header";
 import { FinanceAccessMessage } from "@/components/finance/finance-access-message";
 import { FinanceSummaryCards } from "@/components/finance/finance-summary-cards";
 import { getFinanceSummary } from "@/lib/actions/finance";
@@ -34,12 +35,10 @@ export default async function FinancePage() {
 
   return (
     <>
-      <div className="mb-6">
-        <h1 className="text-2xl font-semibold tracking-tight">Finance</h1>
-        <p className="mt-1 text-sm text-zinc-500">
-          Track income, expenses, invoices, and monthly totals.
-        </p>
-      </div>
+      <PageHeader
+        title="Finance"
+        description="Track income, expenses, invoices, and monthly totals."
+      />
 
       <FinanceSummaryCards summary={summary} />
 
@@ -48,7 +47,7 @@ export default async function FinancePage() {
           <Link
             key={item.href}
             href={item.href}
-            className="rounded-xl border bg-white p-5 text-sm font-medium text-zinc-900 hover:bg-zinc-50"
+            className="crm-card p-5 text-sm font-medium text-crm-heading transition-colors hover:bg-[#f6f9fc]"
           >
             {item.title}
           </Link>
