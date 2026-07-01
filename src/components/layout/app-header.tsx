@@ -38,13 +38,13 @@ export function AppHeader({
   const searchTabs = getSearchTabsForUser(user);
 
   return (
-    <header className="sticky top-0 z-40 flex h-[72px] w-full border-b border-crm-border bg-white/95 shadow-theme-xs backdrop-blur supports-[backdrop-filter]:bg-white/90">
-      <div className="flex grow items-center justify-between gap-4 px-4 sm:px-6 md:px-8">
-        <div className="flex items-center gap-3 min-w-0 flex-1">
+    <header className="sticky top-0 z-40 flex h-[88px] w-full border-b border-white/70 bg-white/85 shadow-[0_18px_45px_-36px_rgba(15,23,42,0.55)] backdrop-blur-2xl supports-[backdrop-filter]:bg-white/75">
+      <div className="flex grow items-center justify-between gap-5 px-4 sm:px-7 md:px-10">
+        <div className="flex min-w-0 flex-1 items-center gap-4">
           <button
             type="button"
             onClick={onToggleSidebar}
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-crm-border bg-white text-gray-500 shadow-theme-xs transition-colors hover:bg-gray-50 lg:hidden"
+            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-white/80 bg-white/85 text-gray-500 shadow-theme-xs transition hover:-translate-y-0.5 hover:bg-white hover:text-gray-900 hover:shadow-theme-md lg:hidden"
           >
             <Menu className="h-5 w-5" />
           </button>
@@ -53,7 +53,7 @@ export function AppHeader({
           </div>
         </div>
 
-        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+        <div className="flex shrink-0 items-center gap-2.5 sm:gap-3">
           <NotificationDropdown
             notifications={latestNotifications}
             unreadCount={unreadNotifications}
@@ -62,16 +62,18 @@ export function AppHeader({
           <Link
             href="/chat"
             aria-label="Open chat"
-            className="hidden h-11 w-11 items-center justify-center rounded-xl border border-crm-border bg-white text-crm-heading shadow-theme-xs transition-colors hover:bg-gray-50 sm:flex"
+            className="hidden h-14 w-14 items-center justify-center rounded-2xl border border-white/80 bg-white/85 text-crm-heading shadow-theme-xs transition hover:-translate-y-0.5 hover:bg-white hover:shadow-theme-md sm:flex"
           >
             <Mail className="h-4.5 w-4.5" />
           </Link>
 
-          <div className="hidden h-6 w-px bg-gray-200 sm:block" />
+          <div className="hidden h-8 w-px bg-gray-200 sm:block" />
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 rounded-2xl border border-transparent px-1.5 py-1 transition hover:border-white/80 hover:bg-white/55">
             <div className="hidden text-right sm:block">
-              <p className="text-sm font-semibold text-crm-heading leading-tight">{user.name}</p>
+              <p className="max-w-[170px] truncate text-sm font-bold leading-tight text-crm-heading">
+                {user.name}
+              </p>
               <p className="mt-0.5 text-xs font-medium text-gray-400 capitalize">
                 {user.role.replace("_", " ")}
               </p>
