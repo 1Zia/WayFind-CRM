@@ -109,14 +109,6 @@ export function SidebarNav({
         })}
       </nav>
 
-      <div className="border-t border-crm-border px-6 py-4.5">
-        <p className="truncate text-sm font-semibold text-crm-heading">
-          {user.name}
-        </p>
-        <p className="truncate text-xs font-medium text-gray-400 capitalize">
-          {user.role.replace("_", " ")}
-        </p>
-      </div>
     </>
   );
 

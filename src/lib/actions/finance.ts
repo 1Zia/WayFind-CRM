@@ -39,7 +39,13 @@ function nullable(value?: string) {
   return value || null;
 }
 
-async function requireFinance(permission: "finance:view" | "finance:create" | "finance:update") {
+async function requireFinance(
+  permission:
+    | "finance:view"
+    | "finance:create"
+    | "finance:update"
+    | "finance:delete",
+) {
   const user = await requireUser();
   requirePermission(user, permission);
   return user;
@@ -311,6 +317,35 @@ export async function updateIncome(id: string, input: IncomeInput) {
   };
 }
 
+export async function deleteIncome(id: string) {
+  const user = await requireFinance("finance:delete");
+  const incomeId = idSchema.parse(id);
+
+  const [record] = await db
+    .delete(income)
+    .where(eq(income.id, incomeId))
+    .returning();
+
+  if (!record) {
+    throw new Error("Income record not found");
+  }
+
+  await createAuditLog({
+    userId: user.id,
+    action: "delete",
+    entityType: "income",
+    entityId: record.id,
+    description: `Deleted income record ${record.id}`,
+  });
+
+  revalidateFinancePaths(record.id);
+
+  return {
+    success: true,
+    data: record,
+  };
+}
+
 export async function getExpenses() {
   await requireFinance("finance:view");
 
@@ -388,6 +423,35 @@ export async function updateExpense(id: string, input: ExpenseInput) {
     entityType: "expense",
     entityId: record.id,
     description: `Updated expense ${record.title}`,
+  });
+
+  revalidateFinancePaths(record.id);
+
+  return {
+    success: true,
+    data: record,
+  };
+}
+
+export async function deleteExpense(id: string) {
+  const user = await requireFinance("finance:delete");
+  const expenseId = idSchema.parse(id);
+
+  const [record] = await db
+    .delete(expenses)
+    .where(eq(expenses.id, expenseId))
+    .returning();
+
+  if (!record) {
+    throw new Error("Expense not found");
+  }
+
+  await createAuditLog({
+    userId: user.id,
+    action: "delete",
+    entityType: "expense",
+    entityId: record.id,
+    description: `Deleted expense ${record.title}`,
   });
 
   revalidateFinancePaths(record.id);

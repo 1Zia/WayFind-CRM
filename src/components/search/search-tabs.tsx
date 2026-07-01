@@ -26,8 +26,8 @@ export function SearchTabs({ activeTab, tabs, onChange }: SearchTabsProps) {
             onClick={() => onChange(tab.value)}
             className={
               active
-                ? "rounded-md bg-brand-50 px-4 py-2 text-sm font-semibold text-brand-600 shrink-0"
-                : "rounded-md px-4 py-2 text-sm font-medium text-crm-muted hover:bg-gray-100 hover:text-crm-heading transition-colors shrink-0"
+                ? "liquid-glass-active shrink-0 rounded-xl px-4 py-2 text-sm font-semibold text-brand-600"
+                : "shrink-0 rounded-xl px-4 py-2 text-sm font-medium text-crm-muted transition-colors hover:bg-white/50 hover:text-crm-heading"
             }
           >
             {tab.label}

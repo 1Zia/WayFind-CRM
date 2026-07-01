@@ -1,4 +1,9 @@
-import { MoreVertical, type LucideIcon } from "lucide-react";
+import { type LucideIcon } from "lucide-react";
+
+import {
+  MetricCardMenu,
+  type MetricAction,
+} from "@/components/shared/metric-card-menu";
 
 type MetricCardProps = {
   title: string;
@@ -6,6 +11,7 @@ type MetricCardProps = {
   detail?: string;
   icon?: LucideIcon;
   tone?: "primary" | "secondary" | "success" | "warning" | "danger" | "info";
+  actions?: MetricAction[];
 };
 
 const iconTones: Record<
@@ -26,11 +32,12 @@ export function MetricCard({
   detail,
   icon: Icon,
   tone = "primary",
+  actions = [],
 }: MetricCardProps) {
   const colors = iconTones[tone];
 
   return (
-    <div className="crm-card flex min-h-[150px] flex-col justify-between p-5 md:p-6">
+    <div className="crm-card relative flex min-h-[150px] flex-col justify-between overflow-visible p-5 md:p-6">
       <div className="flex items-start justify-between gap-3">
         {Icon ? (
           <div
@@ -39,14 +46,10 @@ export function MetricCard({
             <Icon className={`h-5 w-5 ${colors.text}`} />
           </div>
         ) : null}
-        <button
-          type="button"
-          aria-label="Metric options"
-          className="flex h-9 w-9 items-center justify-center rounded-xl border border-crm-border bg-white text-gray-500"
-        >
-          <MoreVertical className="h-4 w-4" />
-        </button>
+
+        <MetricCardMenu actions={actions} title={title} />
       </div>
+
       <div className="mt-5 flex items-end justify-between">
         <div>
           <span className="text-sm font-medium text-gray-500">{title}</span>
@@ -54,7 +57,7 @@ export function MetricCard({
             {value}
           </h4>
           {detail ? (
-            <p className="mt-1 text-xs text-gray-400 font-medium">{detail}</p>
+            <p className="mt-1 text-xs font-medium text-gray-400">{detail}</p>
           ) : null}
         </div>
       </div>

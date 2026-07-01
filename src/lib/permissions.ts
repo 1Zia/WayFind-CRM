@@ -10,6 +10,7 @@ const permissions = {
     "finance:view",
     "finance:create",
     "finance:update",
+    "finance:delete",
     "documents:view",
     "reports:view",
   ],
@@ -73,6 +74,7 @@ export type Permission =
   | "finance:view"
   | "finance:create"
   | "finance:update"
+  | "finance:delete"
   | "reports:view"
   | "team:view"
   | "documents:view"

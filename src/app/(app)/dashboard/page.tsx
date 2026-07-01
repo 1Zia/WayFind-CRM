@@ -72,6 +72,10 @@ export default async function DashboardPage() {
             value={stats.totalClients}
             icon={Users}
             tone="primary"
+            actions={[
+              { href: "/clients", label: "View clients" },
+              { href: "/clients/new", label: "New client" },
+            ]}
           />
         ) : null}
         {stats.permissions.canViewLeads ? (
@@ -80,6 +84,10 @@ export default async function DashboardPage() {
             value={stats.totalLeads}
             icon={Target}
             tone="secondary"
+            actions={[
+              { href: "/leads", label: "View leads" },
+              { href: "/leads/new", label: "New lead" },
+            ]}
           />
         ) : null}
         {stats.permissions.canViewProjects ? (
@@ -88,6 +96,10 @@ export default async function DashboardPage() {
             value={stats.activeProjects}
             icon={Briefcase}
             tone="info"
+            actions={[
+              { href: "/projects", label: "View projects" },
+              { href: "/projects/new", label: "New project" },
+            ]}
           />
         ) : null}
         {stats.permissions.canViewTasks ? (
@@ -96,6 +108,10 @@ export default async function DashboardPage() {
             value={stats.pendingTasks}
             icon={CheckSquare}
             tone="warning"
+            actions={[
+              { href: "/tasks", label: "View tasks" },
+              { href: "/tasks/new", label: "New task" },
+            ]}
           />
         ) : null}
         {stats.permissions.canViewTasks ? (
@@ -104,6 +120,10 @@ export default async function DashboardPage() {
             value={stats.activeSprintTasks}
             icon={Zap}
             tone="secondary"
+            actions={[
+              { href: "/tasks", label: "Open board" },
+              { href: "/tasks/new", label: "New task" },
+            ]}
           />
         ) : null}
         {stats.permissions.canViewFinance ? (
@@ -113,18 +133,30 @@ export default async function DashboardPage() {
               value={formatMoney(stats.revenue)}
               icon={TrendingUp}
               tone="success"
+              actions={[
+                { href: "/finance/income", label: "View income" },
+                { href: "/finance/reports", label: "Finance reports" },
+              ]}
             />
             <MetricCard
               title="Expenses"
               value={formatMoney(stats.expenses)}
               icon={TrendingDown}
               tone="danger"
+              actions={[
+                { href: "/finance/expenses", label: "View expenses" },
+                { href: "/finance/reports", label: "Finance reports" },
+              ]}
             />
             <MetricCard
               title="Profit / Loss"
               value={formatMoney(stats.profitLoss)}
               icon={DollarSign}
               tone={stats.profitLoss >= 0 ? "success" : "danger"}
+              actions={[
+                { href: "/finance", label: "Finance overview" },
+                { href: "/finance/reports", label: "Finance reports" },
+              ]}
             />
           </>
         ) : null}
@@ -133,6 +165,10 @@ export default async function DashboardPage() {
           value={stats.unreadNotifications}
           icon={Bell}
           tone="info"
+          actions={[
+            { href: "/notifications", label: "View notifications" },
+            { href: "/settings", label: "Notification settings" },
+          ]}
         />
       </div>
 
@@ -299,24 +335,30 @@ function EmployeeDashboard({ stats }: { stats: EmployeeDashboardStats }) {
           value={stats.summary.pendingAssigned}
           icon={CheckSquare}
           tone="primary"
+          actions={[
+            { href: "/tasks", label: "View my tasks" },
+          ]}
         />
         <MetricCard
           title="Overdue"
           value={stats.summary.overdue}
           icon={TrendingDown}
           tone="danger"
+          actions={[{ href: "/tasks", label: "View overdue" }]}
         />
         <MetricCard
           title="Due Today"
           value={stats.summary.dueToday}
           icon={Zap}
           tone="warning"
+          actions={[{ href: "/tasks", label: "View due today" }]}
         />
         <MetricCard
           title="Completed This Week"
           value={stats.summary.completedThisWeek}
           icon={TrendingUp}
           tone="success"
+          actions={[{ href: "/tasks", label: "View completed" }]}
         />
       </div>
 
