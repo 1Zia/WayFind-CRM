@@ -129,7 +129,7 @@ export function TaskGroupTable({
               canUpdateTask || task.assignedTo === currentUserId;
 
             return (
-              <tr key={task.id} className="border-b last:border-0">
+              <tr key={task.id} className="crm-table-row">
                 {visibleColumnSet.has("actions") ? (
                   <td className="w-36 px-3 py-3 align-top">
                     <TaskInlineStatusSelect
@@ -142,7 +142,7 @@ export function TaskGroupTable({
                 <td className="min-w-64 px-3 py-3 align-top">
                   <Link
                     href={`/tasks/${task.id}`}
-                    className="font-medium text-zinc-950 hover:text-purple-600"
+                    className="font-medium text-zinc-950 hover:text-zinc-700"
                   >
                     {task.title}
                   </Link>

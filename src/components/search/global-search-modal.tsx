@@ -165,19 +165,19 @@ export function GlobalSearchModal({
       role="dialog"
       aria-modal="true"
       aria-label="Global search"
-      className="fixed inset-0 z-[9999] flex items-start justify-center p-4 sm:p-10 md:p-20 overflow-y-auto"
+      className="fixed inset-0 z-[9999] flex items-start justify-center overflow-y-auto p-4 sm:p-10 md:p-20"
     >
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity duration-300"
+        className="fixed inset-0 bg-gray-900/25 backdrop-blur-sm transition-opacity duration-300"
         onClick={handleClose}
       />
 
       {/* Dialog Card */}
-      <div className="relative z-10 w-full max-w-3xl rounded-2xl border border-gray-200 bg-white shadow-theme-xl flex flex-col max-h-[85vh] overflow-hidden pointer-events-auto">
+      <div className="pointer-events-auto relative z-10 flex max-h-[85vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border border-crm-border bg-white shadow-theme-xl">
         {/* Search Input Area */}
-        <div className="px-6 py-5 flex items-center gap-3 border-b border-gray-200">
-          <Search className="h-6 w-6 text-brand-500 shrink-0" />
+        <div className="flex items-center gap-3 border-b border-crm-border px-6 py-5">
+          <Search className="h-6 w-6 shrink-0 text-slate-700" />
           <input
             ref={inputRef}
             value={query}
@@ -194,14 +194,14 @@ export function GlobalSearchModal({
             type="button"
             aria-label="Close search"
             onClick={handleClose}
-            className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-700"
+            className="rounded-xl p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-700"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
         {/* Tabs & Filters */}
-        <div className="flex items-center justify-between gap-4 border-b border-gray-100 px-6 py-3 bg-gray-50/50">
+        <div className="flex items-center justify-between gap-4 border-b border-crm-border bg-gray-50/80 px-6 py-3">
           <div className="flex-1 min-w-0">
             <SearchTabs
               activeTab={activeTab}
@@ -217,14 +217,14 @@ export function GlobalSearchModal({
             <button
               type="button"
               onClick={() => setShowDateFilters((current) => !current)}
-              className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-500 hover:bg-gray-50 shadow-theme-xs whitespace-nowrap"
+              className="inline-flex items-center gap-2 whitespace-nowrap rounded-xl border border-crm-border bg-white px-3 py-1.5 text-xs font-semibold text-gray-500 shadow-theme-xs hover:bg-gray-50"
             >
               <Calendar className="h-3.5 w-3.5" />
               {dateFilter === "Anytime" ? "Filter by date" : dateFilter}
             </button>
 
             {showDateFilters ? (
-              <div className="absolute right-0 top-full z-[90] mt-1.5 w-40 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-theme-lg">
+              <div className="absolute right-0 top-full z-[90] mt-1.5 w-40 overflow-hidden rounded-xl border border-crm-border bg-white shadow-theme-lg">
                 {dateFilters.map((filter) => (
                   <button
                     key={filter}
@@ -269,7 +269,7 @@ export function GlobalSearchModal({
 
               {isPending ? (
                 <div className="flex items-center justify-center py-16 text-sm text-gray-400">
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin text-brand-500" />
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin text-slate-700" />
                   Searching WayFind...
                 </div>
               ) : response.groups.length > 0 ? (
@@ -279,7 +279,7 @@ export function GlobalSearchModal({
                       <h2 className="mb-2 text-xs font-bold uppercase tracking-wider text-gray-400">
                         {group.label}
                       </h2>
-                      <div className="rounded-xl border border-gray-100 bg-white p-1.5 shadow-theme-xs space-y-1">
+                      <div className="space-y-1 rounded-xl border border-crm-border bg-white p-1.5 shadow-theme-xs">
                         {group.results.map((result) => (
                           <SearchResultItem
                             key={`${result.type}-${result.id}`}
@@ -292,7 +292,7 @@ export function GlobalSearchModal({
                   ))}
                 </div>
               ) : (
-                <div className="rounded-xl border border-dashed border-gray-200 bg-gray-50/50 p-10 text-center">
+                <div className="rounded-2xl border border-dashed border-gray-200 bg-gray-50/80 p-10 text-center">
                   <h2 className="text-sm font-semibold text-gray-900">
                     No results found
                   </h2>
@@ -323,7 +323,7 @@ function SearchEmptyState({
   onClose: () => void;
 }) {
   return (
-    <div className="pt-6">
+    <div className="pt-2">
       <div className="grid gap-8 lg:grid-cols-4">
         <section>
           <div className="mb-5 flex items-center gap-2 text-base font-semibold text-gray-900">
@@ -411,7 +411,7 @@ function SearchEmptyState({
             <button
               type="button"
               onClick={onFocusSearch}
-              className="rounded-lg bg-brand-500 px-3.5 py-2 text-xs font-semibold text-white hover:bg-brand-600 shadow-theme-xs"
+              className="liquid-glass-primary rounded-xl px-3.5 py-2 text-xs font-semibold text-slate-900 hover:shadow-theme-md"
             >
               Open search box
             </button>

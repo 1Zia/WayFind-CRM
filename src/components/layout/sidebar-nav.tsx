@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { X } from "lucide-react";
+import { Zap, X } from "lucide-react";
 
 import { navigationGroups } from "@/config/navigation";
 import { canAccessRoute } from "@/lib/permissions";
@@ -33,14 +33,14 @@ export function SidebarNav({
 
   const content = (
     <>
-      <div className="flex h-16 items-center justify-between border-b border-crm-border px-6">
+      <div className="flex h-[72px] items-center justify-between border-b border-crm-border px-6">
         <Link
           href="/dashboard"
           onClick={onMobileClose}
           className="flex items-center gap-3.5"
         >
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-500 text-base font-bold text-white shadow-theme-xs">
-            W
+          <div className="liquid-glass-active flex h-10 w-10 items-center justify-center rounded-xl text-slate-900">
+            <Zap className="relative z-10 h-5 w-5 fill-slate-900" />
           </div>
           <div>
             <p className="text-base font-bold tracking-tight text-crm-heading leading-tight">
@@ -87,15 +87,15 @@ export function SidebarNav({
                       <Link
                         href={item.href}
                         onClick={onMobileClose}
-                        className={`flex items-center gap-3 rounded-lg px-3.5 py-2.5 text-sm font-medium transition-colors ${
+                        className={`flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition-colors ${
                           active
-                            ? "bg-brand-50 text-brand-500"
-                            : "text-gray-700 hover:bg-gray-100 hover:text-gray-700"
+                            ? "liquid-glass-active text-slate-900"
+                            : "text-gray-700 hover:bg-white hover:text-slate-900"
                         }`}
                       >
                         <Icon
                           className={`h-5 w-5 shrink-0 ${
-                            active ? "text-brand-500" : "text-gray-500"
+                            active ? "text-slate-900" : "text-gray-500"
                           }`}
                         />
                         {item.title}
@@ -122,7 +122,7 @@ export function SidebarNav({
 
   return (
     <>
-      <aside className="hidden w-[290px] shrink-0 flex-col border-r border-crm-border bg-crm-surface lg:flex h-screen sticky top-0">
+      <aside className="hidden w-[290px] shrink-0 flex-col border-r border-crm-border bg-[#f7f8fa] lg:flex h-screen sticky top-0">
         {content}
       </aside>
 
@@ -134,7 +134,7 @@ export function SidebarNav({
             onClick={onMobileClose}
             className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm"
           />
-          <aside className="relative flex h-full w-[290px] max-w-[85vw] flex-col bg-crm-surface shadow-theme-xl">
+          <aside className="relative flex h-full w-[290px] max-w-[85vw] flex-col bg-[#f7f8fa] shadow-theme-xl">
             {content}
           </aside>
         </div>

@@ -161,14 +161,14 @@ export function MessageBubble({
             message.isDeleted
               ? "border-dashed border-crm-border bg-crm-body text-crm-muted italic"
               : isSelf
-              ? "bg-crm-primary border-crm-primary/80 text-white rounded-tr-none"
+              ? "liquid-glass-active border-white/70 text-slate-900 rounded-tr-none"
               : "bg-crm-surface border-crm-border-soft text-crm-heading rounded-tl-none"
           }`}
         >
           {/* Parent Message Reference Preview */}
           {parentMessage && !message.isDeleted && (
             <div className={`mb-1.5 border-l-2 pl-2 py-0.5 text-xs truncate rounded-sm ${
-              isSelf ? "border-white/50 text-white/80 bg-white/10" : "border-crm-primary/50 text-crm-muted bg-crm-primary-soft/20"
+              isSelf ? "border-slate-300 text-slate-600 bg-white/30" : "border-crm-primary/50 text-crm-muted bg-crm-primary-soft/20"
             }`}>
               <p className="font-bold text-[10px]">
                 Reply to {parentMessage.senderName || "Teammate"}
@@ -184,20 +184,20 @@ export function MessageBubble({
                 type="text"
                 value={editContent}
                 onChange={(e) => setEditContent(e.target.value)}
-                className="rounded border border-white/30 bg-transparent px-2 py-0.5 text-sm text-white outline-none focus:border-white"
+                className="rounded border border-slate-300 bg-white/40 px-2 py-0.5 text-sm text-slate-900 outline-none focus:border-slate-400"
                 autoFocus
               />
               <button
                 type="submit"
                 disabled={updating}
-                className="rounded-full bg-white/20 p-1 text-white hover:bg-white/30"
+                className="rounded-full bg-white/60 p-1 text-slate-900 hover:bg-white"
               >
                 <Check className="h-3.5 w-3.5" />
               </button>
               <button
                 type="button"
                 onClick={() => setIsEditing(false)}
-                className="rounded-full bg-white/20 p-1 text-white hover:bg-white/30"
+                className="rounded-full bg-white/60 p-1 text-slate-900 hover:bg-white"
               >
                 <X className="h-3.5 w-3.5" />
               </button>
@@ -231,7 +231,7 @@ export function MessageBubble({
                       <a
                         href={message.attachmentUrl}
                         download={message.attachmentName || "file"}
-                        className={`rounded-full p-1.5 hover:bg-black/10 transition-colors shrink-0`}
+                        className="shrink-0 rounded-full p-1.5 transition-colors hover:bg-slate-100"
                         target="_blank"
                         rel="noopener noreferrer"
                       >
@@ -247,14 +247,14 @@ export function MessageBubble({
 
           {/* Edited indicator */}
           {message.isEdited && !message.isDeleted && (
-            <span className={`float-right ml-2 mt-1 text-[9px] ${isSelf ? "text-white/60" : "text-crm-muted"}`}>
+            <span className={`float-right ml-2 mt-1 text-[9px] ${isSelf ? "text-slate-500" : "text-crm-muted"}`}>
               (edited)
             </span>
           )}
 
           {/* Time indicator for self */}
           {isSelf && (
-            <span className="float-right ml-2 mt-1 text-[9px] text-white/60">
+            <span className="float-right ml-2 mt-1 text-[9px] text-slate-500">
               {formattedTime}
             </span>
           )}

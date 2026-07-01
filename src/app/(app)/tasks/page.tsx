@@ -75,7 +75,7 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
         description="Plan sprint work, manage assignments, and track delivery."
       />
 
-      <div className="border-b border-crm-border-soft">
+      <div className="crm-card p-2">
         <div className="flex flex-wrap gap-1">
           {views.map((view) => {
             const active = activeView === view.value;
@@ -86,8 +86,8 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
                 href={getViewHref(view.value, searchParams)}
                 className={
                   active
-                    ? "border-b-2 border-crm-primary px-4 pb-3 text-sm font-semibold text-crm-primary"
-                    : "px-4 pb-3 text-sm font-medium text-crm-muted transition-colors hover:text-crm-heading"
+                    ? "liquid-glass-active rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-900"
+                    : "rounded-xl px-4 py-2.5 text-sm font-medium text-crm-muted transition-colors hover:bg-gray-50 hover:text-crm-heading"
                 }
               >
                 {view.label}

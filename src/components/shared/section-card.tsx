@@ -21,7 +21,7 @@ export function SectionCard({
         <div>
           <h2 className="text-base font-bold text-crm-heading">{title}</h2>
           {description ? (
-            <p className="mt-1 text-xs font-medium text-gray-400">{description}</p>
+            <p className="mt-1 text-sm text-crm-muted">{description}</p>
           ) : null}
         </div>
         {action ? <div className="shrink-0">{action}</div> : null}

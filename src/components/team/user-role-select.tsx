@@ -74,7 +74,7 @@ export function UserRoleSelect({
         type="button"
         disabled={loading || role === value}
         onClick={handleSave}
-        className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-60"
+        className="liquid-glass-primary rounded-xl px-4 py-2 text-sm font-semibold text-slate-900 hover:shadow-theme-md disabled:opacity-60"
       >
         {loading ? "Saving..." : "Save Role"}
       </button>

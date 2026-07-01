@@ -254,7 +254,7 @@ export function GroupChatDialog({
                       <div
                         className={`flex h-4 w-4 items-center justify-center rounded-md border ${
                           isSelected
-                            ? "border-crm-primary bg-crm-primary text-white"
+                            ? "liquid-glass-active border-white/70 text-slate-900"
                             : "border-crm-border"
                         }`}
                       >
@@ -284,7 +284,7 @@ export function GroupChatDialog({
           <button
             type="submit"
             disabled={loading}
-            className="flex items-center gap-2 rounded-lg bg-crm-primary px-4 py-2 text-sm font-semibold text-white hover:bg-crm-primary/95 disabled:opacity-50 transition-colors"
+            className="liquid-glass-primary flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold text-slate-900 hover:shadow-theme-md disabled:opacity-50"
           >
             {loading ? (
               <>

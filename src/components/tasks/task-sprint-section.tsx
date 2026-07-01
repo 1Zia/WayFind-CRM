@@ -43,8 +43,8 @@ export function TaskSprintSection({
   const progress = tasks.length > 0 ? Math.round((completedTasks / tasks.length) * 100) : 0;
 
   return (
-    <section className={`overflow-hidden rounded-xl border-l-4 ${accent} border-y border-r bg-white`}>
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b px-4 py-4">
+    <section className={`overflow-hidden rounded-2xl border-l-4 ${accent} border-y border-r border-crm-border bg-white shadow-card`}>
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-crm-border px-4 py-4">
         <div>
           <h2 className="text-lg font-semibold text-zinc-950">{title}</h2>
           <p className="mt-1 text-sm text-zinc-500">
@@ -55,7 +55,7 @@ export function TaskSprintSection({
         <div className="flex min-w-48 items-center gap-3 text-sm text-zinc-500">
           <div className="h-2 flex-1 overflow-hidden rounded-full bg-zinc-100">
             <div
-              className="h-full rounded-full bg-purple-600"
+              className="h-full rounded-full bg-gradient-to-r from-white via-slate-200 to-slate-400 shadow-inner"
               style={{ width: `${progress}%` }}
             />
           </div>

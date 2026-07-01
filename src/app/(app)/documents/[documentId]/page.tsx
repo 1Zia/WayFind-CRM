@@ -33,7 +33,7 @@ export default async function DocumentPage({
         {options.canUpdate ? (
           <Link
             href={`/documents/${document.id}/edit`}
-            className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
+            className="liquid-glass-primary rounded-xl px-4 py-2 text-sm font-semibold text-slate-900 hover:shadow-theme-md"
           >
             Edit
           </Link>

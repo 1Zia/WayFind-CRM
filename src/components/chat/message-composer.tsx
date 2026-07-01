@@ -239,7 +239,7 @@ export function MessageComposer({
         <button
           type="submit"
           disabled={isButtonDisabled}
-          className="flex h-[38px] w-[38px] items-center justify-center rounded-xl bg-crm-primary text-white hover:bg-crm-primary/90 disabled:bg-crm-primary-soft disabled:text-crm-primary/60 transition-all shrink-0"
+          className="liquid-glass-primary flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-xl text-slate-900 transition-all hover:shadow-theme-md disabled:opacity-50"
         >
           {sending || isUploading ? (
             <Loader2 className="h-4 w-4 animate-spin" />

@@ -43,14 +43,14 @@ export function GlobalSearchInput({ tabs }: GlobalSearchInputProps) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="relative flex h-11 w-full max-w-[430px] items-center justify-between rounded-lg border border-gray-200 bg-gray-50/30 px-3.5 text-left text-sm text-gray-400 hover:border-brand-400 hover:bg-white transition-all cursor-text shadow-theme-xs"
+        className="relative flex h-12 w-full max-w-[430px] cursor-text items-center justify-between rounded-2xl border border-crm-border bg-white px-4 text-left text-sm text-gray-400 shadow-theme-xs transition-all hover:border-zinc-300 hover:bg-white"
       >
         <span className="flex min-w-0 items-center gap-2.5">
           <Search className="h-4.5 w-4.5 shrink-0 text-gray-400" />
-          <span className="truncate text-gray-400">Search or type command...</span>
+          <span className="truncate text-gray-400">Search anything...</span>
         </span>
-        <span className="hidden rounded-md border border-gray-200 bg-white px-2 py-0.5 text-[10px] font-semibold text-gray-500 sm:inline shadow-theme-xs">
-          ⌘ K
+        <span className="hidden rounded-lg border border-gray-200 bg-gray-50 px-2 py-0.5 text-[10px] font-semibold text-gray-500 shadow-theme-xs sm:inline">
+          Ctrl K
         </span>
       </button>
 

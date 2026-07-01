@@ -272,7 +272,7 @@ export function TaskBoard({
       ) : null}
 
       {activeView === "kanban" && activeSprintTasks.length > 0 ? (
-        <div className="rounded-xl border bg-white p-4 text-sm text-zinc-500">
+        <div className="crm-card p-4 text-sm text-zinc-500">
           Active sprint tasks shown in Kanban: {activeSprintTasks.length}
         </div>
       ) : null}
@@ -504,9 +504,9 @@ function AllSprintsTable({
   tasks: TaskRow[];
 }) {
   return (
-    <div className="overflow-hidden rounded-xl border bg-white">
+    <div className="crm-card overflow-hidden">
       <table className="w-full text-sm">
-        <thead className="border-b bg-zinc-50 text-left text-xs text-zinc-500">
+        <thead className="crm-table-head text-left text-xs">
           <tr>
             <th className="px-4 py-3 font-medium">Sprint</th>
             <th className="px-4 py-3 font-medium">Status</th>
@@ -522,7 +522,7 @@ function AllSprintsTable({
             const completedTasks = sprintTasks.filter((task) => task.status === "done").length;
 
             return (
-              <tr key={sprint.id} className="border-b last:border-0">
+              <tr key={sprint.id} className="crm-table-row">
                 <td className="px-4 py-3 font-medium">{sprint.name}</td>
                 <td className="px-4 py-3 capitalize">{sprint.status}</td>
                 <td className="px-4 py-3 text-zinc-600">
@@ -652,7 +652,7 @@ function EmptyBoardMessage({
   title: string;
 }) {
   return (
-    <div className="rounded-xl border border-dashed bg-white p-10 text-center">
+    <div className="rounded-2xl border border-dashed border-crm-border bg-white p-10 text-center shadow-card">
       <h2 className="font-semibold text-zinc-950">{title}</h2>
       <p className="mt-2 text-sm text-zinc-500">{description}</p>
     </div>

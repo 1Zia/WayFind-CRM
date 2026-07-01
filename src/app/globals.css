@@ -22,17 +22,68 @@
 
   body {
     @apply bg-crm-body font-outfit text-crm-heading antialiased;
-    color: #101828;
+    color: #111111;
   }
 }
 
 @layer components {
+  .liquid-glass {
+    @apply relative overflow-hidden border border-white/70 bg-white/55 text-crm-heading shadow-theme-sm backdrop-blur-xl transition-all;
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.42) 45%, rgba(226, 232, 240, 0.62)),
+      radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.95), transparent 32%),
+      radial-gradient(circle at 100% 100%, rgba(148, 163, 184, 0.22), transparent 38%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.88),
+      inset 0 -18px 34px rgba(148, 163, 184, 0.12),
+      0 18px 46px -30px rgba(15, 23, 42, 0.48),
+      0 1px 2px rgba(15, 23, 42, 0.06);
+  }
+
+  .liquid-glass::before,
+  .liquid-glass-primary::before,
+  .liquid-glass-active::before {
+    content: "";
+    position: absolute;
+    inset: 1px 1px auto 1px;
+    height: 48%;
+    border-radius: inherit;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0));
+    pointer-events: none;
+  }
+
+  .liquid-glass-primary {
+    @apply relative overflow-hidden border border-white/70 bg-white/55 text-crm-heading shadow-theme-sm backdrop-blur-xl transition-all;
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.42) 45%, rgba(226, 232, 240, 0.62)),
+      radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.95), transparent 32%),
+      radial-gradient(circle at 100% 100%, rgba(148, 163, 184, 0.22), transparent 38%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.88),
+      inset 0 -18px 34px rgba(148, 163, 184, 0.12),
+      0 18px 46px -30px rgba(15, 23, 42, 0.48),
+      0 1px 2px rgba(15, 23, 42, 0.06);
+  }
+
+  .liquid-glass-active {
+    @apply relative overflow-hidden border border-white/70 bg-white/55 text-crm-heading shadow-theme-sm backdrop-blur-xl transition-all;
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.42) 45%, rgba(226, 232, 240, 0.62)),
+      radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.95), transparent 32%),
+      radial-gradient(circle at 100% 100%, rgba(148, 163, 184, 0.22), transparent 38%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.95),
+      inset 0 -16px 32px rgba(148, 163, 184, 0.16),
+      0 18px 42px -28px rgba(15, 23, 42, 0.55),
+      0 0 0 1px rgba(255, 255, 255, 0.52);
+  }
+
   .crm-card {
-    @apply rounded-2xl border border-crm-border bg-crm-surface shadow-theme-xs;
+    @apply rounded-2xl border border-crm-border bg-crm-surface shadow-card;
   }
 
   .crm-input {
-    @apply mt-1.5 w-full rounded-lg border border-gray-200 bg-transparent px-4 py-2.5 text-sm text-crm-heading outline-none transition-colors placeholder:text-gray-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10;
+    @apply mt-1.5 w-full rounded-xl border border-crm-border bg-white px-4 py-2.5 text-sm text-crm-heading outline-none transition-colors placeholder:text-gray-400 focus:border-slate-400 focus:ring-2 focus:ring-slate-400/20;
   }
 
   .crm-label {
@@ -48,11 +99,11 @@
   }
 
   .crm-table-row {
-    @apply border-b border-crm-border/40 transition-colors last:border-0 hover:bg-gray-50/50;
+    @apply border-b border-crm-border/70 transition-colors last:border-0 hover:bg-gray-50/80;
   }
 
   .crm-action-link {
-    @apply text-sm font-medium text-crm-primary hover:text-brand-600 hover:underline;
+    @apply text-sm font-medium text-slate-700 hover:text-slate-900 hover:underline;
   }
 
   .crm-action-link-danger {
@@ -60,15 +111,15 @@
   }
 
   .crm-btn-primary {
-    @apply inline-flex items-center justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-600 disabled:opacity-60;
+    @apply liquid-glass-primary inline-flex items-center justify-center rounded-xl px-4 py-2.5 text-sm font-semibold disabled:opacity-60;
   }
 
   .crm-btn-secondary {
-    @apply inline-flex items-center justify-center rounded-lg border border-gray-200 bg-crm-surface px-4 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-60;
+    @apply inline-flex items-center justify-center rounded-xl border border-crm-border bg-crm-surface px-4 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-60;
   }
 
   .crm-btn-ghost {
-    @apply inline-flex items-center justify-center rounded-lg px-3 py-2.5 text-sm font-medium text-gray-500 transition-colors hover:bg-gray-50 hover:text-gray-90;
+    @apply inline-flex items-center justify-center rounded-xl px-3 py-2.5 text-sm font-medium text-gray-500 transition-colors hover:bg-gray-50 hover:text-gray-900;
   }
 }
 

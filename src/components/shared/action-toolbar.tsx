@@ -11,7 +11,7 @@ export function ActionToolbar({
 }: ActionToolbarProps) {
   return (
     <div
-      className={`flex flex-wrap items-center gap-3 rounded-card border border-crm-border-soft bg-crm-surface px-4 py-3 shadow-card ${className}`.trim()}
+      className={`flex flex-wrap items-center gap-3 rounded-2xl border border-crm-border bg-crm-surface px-4 py-3 shadow-card ${className}`.trim()}
     >
       {children}
     </div>

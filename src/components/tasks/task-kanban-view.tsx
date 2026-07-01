@@ -45,8 +45,8 @@ export function TaskKanbanView({
         const columnTasks = tasks.filter((task) => task.status === column.status);
 
         return (
-          <section key={column.status} className="rounded-xl border bg-white">
-            <div className="border-b px-4 py-3">
+          <section key={column.status} className="overflow-hidden rounded-2xl border border-crm-border bg-white shadow-card">
+            <div className="border-b border-crm-border px-4 py-3">
               <h2 className="font-semibold text-zinc-950">{column.title}</h2>
               <p className="mt-1 text-xs text-zinc-500">
                 {columnTasks.length} task{columnTasks.length === 1 ? "" : "s"}
@@ -57,7 +57,7 @@ export function TaskKanbanView({
                 <Link
                   key={task.id}
                   href={`/tasks/${task.id}`}
-                  className="block rounded-lg border p-3 hover:border-purple-200 hover:bg-purple-50/30"
+                  className="block rounded-xl border border-crm-border p-3 transition-colors hover:border-zinc-300 hover:bg-gray-50"
                 >
                   <div className="flex items-start justify-between gap-2">
                     <h3 className="text-sm font-medium text-zinc-950">
@@ -80,7 +80,7 @@ export function TaskKanbanView({
               ))}
 
               {columnTasks.length === 0 ? (
-                <div className="rounded-lg border border-dashed p-6 text-center text-sm text-zinc-500">
+                <div className="rounded-xl border border-dashed border-crm-border p-6 text-center text-sm text-zinc-500">
                   No tasks.
                 </div>
               ) : null}

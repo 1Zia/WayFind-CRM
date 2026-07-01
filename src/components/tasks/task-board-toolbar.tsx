@@ -168,7 +168,7 @@ export function TaskBoardToolbar({
         </LiquidButton>
       ) : null}
 
-      <label className="flex min-w-56 items-center gap-2 rounded-lg border border-crm-border bg-crm-surface px-3 py-2 text-sm text-crm-muted">
+      <label className="flex min-w-56 items-center gap-2 rounded-xl border border-crm-border bg-white px-3 py-2 text-sm text-crm-muted shadow-theme-xs">
         <Search className="h-4 w-4" />
         <input
           defaultValue={searchParams.get("search") ?? ""}
@@ -217,7 +217,7 @@ export function TaskBoardToolbar({
             setColumnsOpen((current) => !current);
             setFiltersOpen(false);
           }}
-          className="inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm text-zinc-600 hover:bg-zinc-50"
+          className="inline-flex items-center gap-2 rounded-xl border border-crm-border bg-white px-3 py-2 text-sm text-zinc-600 shadow-theme-xs hover:bg-zinc-50"
         >
           <SlidersHorizontal className="h-4 w-4" />
           Hide columns
@@ -225,13 +225,13 @@ export function TaskBoardToolbar({
         </button>
 
         {columnsOpen ? (
-          <div className="absolute left-0 top-full z-30 mt-2 w-56 rounded-xl border bg-white p-3 shadow-lg">
+          <div className="absolute left-0 top-full z-30 mt-2 w-56 rounded-2xl border border-crm-border bg-white p-3 shadow-theme-lg">
             <div className="mb-2 flex items-center justify-between">
               <p className="text-sm font-medium text-zinc-950">Columns</p>
               <button
                 type="button"
                 onClick={onResetColumns}
-                className="text-xs font-medium text-purple-600 hover:underline"
+                className="text-xs font-medium text-zinc-900 hover:underline"
               >
                 Reset
               </button>
@@ -266,7 +266,7 @@ export function TaskBoardToolbar({
             setFiltersOpen((current) => !current);
             setColumnsOpen(false);
           }}
-          className="inline-flex items-center gap-2 rounded-lg bg-blue-50 px-3 py-2 text-sm text-blue-700 hover:bg-blue-100"
+          className="inline-flex items-center gap-2 rounded-xl border border-crm-border bg-white px-3 py-2 text-sm text-zinc-700 shadow-theme-xs hover:bg-gray-50"
         >
           <Filter className="h-4 w-4" />
           Board filters{activeFilterCount > 0 ? ` (${activeFilterCount})` : ""}
@@ -274,13 +274,13 @@ export function TaskBoardToolbar({
         </button>
 
         {filtersOpen ? (
-          <div className="absolute left-0 top-full z-30 mt-2 w-80 rounded-xl border bg-white p-4 shadow-lg">
+          <div className="absolute left-0 top-full z-30 mt-2 w-80 rounded-2xl border border-crm-border bg-white p-4 shadow-theme-lg">
             <div className="mb-4 flex items-center justify-between">
               <p className="text-sm font-medium text-zinc-950">Board filters</p>
               <button
                 type="button"
                 onClick={clearFilters}
-                className="inline-flex items-center gap-1 text-xs font-medium text-purple-600 hover:underline"
+                className="inline-flex items-center gap-1 text-xs font-medium text-zinc-900 hover:underline"
               >
                 <X className="h-3 w-3" />
                 Clear filters
@@ -394,7 +394,7 @@ function FilterSelect({
       <select
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="rounded-lg border px-3 py-2 text-sm font-normal text-zinc-700"
+        className="rounded-xl border border-crm-border bg-white px-3 py-2 text-sm font-normal text-zinc-700 outline-none focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/10"
       >
         <option value="">Any</option>
         {options.map(([optionValue, optionLabel]) => (

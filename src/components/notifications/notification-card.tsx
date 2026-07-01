@@ -78,7 +78,7 @@ export function NotificationCard({ notification }: NotificationCardProps) {
           </h2>
           <NotificationBadge type={notification.type} />
           {!notification.isRead ? (
-            <span className="rounded-full bg-black px-2 py-0.5 text-xs font-medium text-white">
+            <span className="liquid-glass-active rounded-full px-2 py-0.5 text-xs font-semibold text-slate-900">
               Unread
             </span>
           ) : (

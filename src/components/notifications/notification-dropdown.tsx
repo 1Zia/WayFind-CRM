@@ -84,18 +84,18 @@ export function NotificationDropdown({
         aria-expanded={open}
         aria-label="Open notifications"
         onClick={() => setOpen((current) => !current)}
-        className="relative rounded-lg border border-crm-border bg-crm-surface p-2 text-crm-muted transition-colors hover:bg-[#f6f9fc] hover:text-crm-heading"
+        className="relative flex h-11 w-11 items-center justify-center rounded-xl border border-crm-border bg-white text-crm-heading shadow-theme-xs transition-colors hover:bg-gray-50"
       >
         <Bell className="h-4 w-4" />
         {unreadCount > 0 ? (
-          <span className="absolute -right-2 -top-2 min-w-5 rounded-full bg-crm-secondary px-1.5 py-0.5 text-center text-xs font-medium text-white">
+          <span className="liquid-glass-active absolute -right-2 -top-2 min-w-5 rounded-full px-1.5 py-0.5 text-center text-xs font-semibold text-slate-900">
             {unreadCount > 99 ? "99+" : unreadCount}
           </span>
         ) : null}
       </button>
 
       {open ? (
-        <div className="absolute right-0 top-full z-50 mt-3 w-[360px] overflow-hidden rounded-card border border-crm-border-soft bg-crm-surface shadow-dropdown">
+        <div className="absolute right-0 top-full z-50 mt-3 w-[360px] overflow-hidden rounded-2xl border border-crm-border bg-white shadow-theme-lg">
           <div className="flex items-center justify-between gap-3 border-b px-4 py-3">
             <div>
               <h2 className="text-sm font-semibold text-crm-heading">
@@ -127,7 +127,7 @@ export function NotificationDropdown({
                     key={notification.id}
                     href={`/notifications/${notification.id}`}
                     onClick={() => setOpen(false)}
-                    className="block px-4 py-3 transition-colors hover:bg-[#f6f9fc]"
+                    className="block px-4 py-3 transition-colors hover:bg-gray-50"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
@@ -136,7 +136,7 @@ export function NotificationDropdown({
                             {notification.title}
                           </p>
                           {!notification.isRead ? (
-                            <span className="h-2 w-2 rounded-full bg-purple-600" />
+                            <span className="h-2 w-2 rounded-full bg-slate-400 shadow-[0_0_0_3px_rgba(226,232,240,0.8)]" />
                           ) : null}
                         </div>
                         <p className="mt-1 line-clamp-2 text-xs text-zinc-600">

@@ -101,7 +101,7 @@ export function ConversationItem({
               />
             ) : (
               <div className={`flex h-11 w-11 items-center justify-center rounded-full text-base font-bold ${
-                isSelected ? "bg-crm-primary text-white" : "bg-crm-primary-soft text-crm-primary"
+                isSelected ? "liquid-glass-active text-slate-900" : "bg-crm-primary-soft text-slate-700"
               }`}>
                 {initial}
               </div>
@@ -123,7 +123,7 @@ export function ConversationItem({
           /* Group avatar styles depending on linkage */
           <div className={`flex h-11 w-11 items-center justify-center rounded-xl text-base font-bold border border-crm-border-soft ${
             isSelected
-              ? "bg-crm-primary text-white"
+              ? "liquid-glass-active text-slate-900"
               : "bg-crm-secondary-soft text-crm-secondary"
           }`}>
             {conversation.projectId ? (
@@ -171,7 +171,7 @@ export function ConversationItem({
 
       {/* Unread Count Badge */}
       {conversation.unreadCount > 0 && !isSelected && (
-        <div className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-crm-primary px-1 text-[10px] font-bold text-white shadow-sm animate-in zoom-in duration-200">
+        <div className="liquid-glass-active flex h-5 min-w-[20px] items-center justify-center rounded-full px-1 text-[10px] font-bold text-slate-900 animate-in zoom-in duration-200">
           {conversation.unreadCount}
         </div>
       )}

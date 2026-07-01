@@ -223,7 +223,7 @@ export function DocumentForm({
               accept={ACCEPTED_EXTENSIONS.join(",")}
               disabled={!uploadReady || loading || isUploading}
               onChange={handleFileChange}
-              className="block w-full text-sm text-zinc-700 file:mr-4 file:rounded-lg file:border-0 file:bg-black file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-zinc-800 disabled:opacity-60"
+              className="block w-full text-sm text-zinc-700 file:mr-4 file:rounded-xl file:border file:border-white/70 file:bg-white/70 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-slate-900 hover:file:bg-white disabled:opacity-60"
             />
             <p className="mt-2 text-xs text-zinc-500">
               PDF, DOC, DOCX, XLS, XLSX, PNG, JPG, JPEG, or WEBP up to 16MB.
@@ -294,7 +294,7 @@ export function DocumentForm({
 
       <button
         disabled={loading || isUploading || (!isEditing && !uploadReady)}
-        className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-60"
+        className="liquid-glass-primary rounded-xl px-4 py-2 text-sm font-semibold text-slate-900 hover:shadow-theme-md disabled:opacity-60"
       >
         {loading || isUploading
           ? isUploading

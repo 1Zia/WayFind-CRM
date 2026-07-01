@@ -56,7 +56,7 @@ export function DocumentDetails({
           href={document.fileUrl}
           target="_blank"
           rel="noreferrer"
-          className="mt-4 inline-flex rounded-lg bg-black px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
+          className="liquid-glass-primary mt-4 inline-flex rounded-xl px-4 py-2 text-sm font-semibold text-slate-900 hover:shadow-theme-md"
         >
           Open Document
         </a>

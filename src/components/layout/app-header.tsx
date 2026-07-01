@@ -1,5 +1,6 @@
 import { UserButton } from "@clerk/nextjs";
-import { Menu } from "lucide-react";
+import { Mail, Menu } from "lucide-react";
+import Link from "next/link";
 
 import type { users } from "@/db/schema";
 import { NotificationDropdown } from "@/components/notifications/notification-dropdown";
@@ -37,13 +38,13 @@ export function AppHeader({
   const searchTabs = getSearchTabsForUser(user);
 
   return (
-    <header className="sticky top-0 z-40 flex h-16 w-full border-b border-crm-border bg-crm-surface/95 backdrop-blur supports-[backdrop-filter]:bg-crm-surface/90">
+    <header className="sticky top-0 z-40 flex h-[72px] w-full border-b border-crm-border bg-white/95 shadow-theme-xs backdrop-blur supports-[backdrop-filter]:bg-white/90">
       <div className="flex grow items-center justify-between gap-4 px-4 sm:px-6 md:px-8">
         <div className="flex items-center gap-3 min-w-0 flex-1">
           <button
             type="button"
             onClick={onToggleSidebar}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 lg:hidden shadow-theme-xs"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-crm-border bg-white text-gray-500 shadow-theme-xs transition-colors hover:bg-gray-50 lg:hidden"
           >
             <Menu className="h-5 w-5" />
           </button>
@@ -52,11 +53,19 @@ export function AppHeader({
           </div>
         </div>
 
-        <div className="flex shrink-0 items-center gap-3 sm:gap-4.5">
+        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
           <NotificationDropdown
             notifications={latestNotifications}
             unreadCount={unreadNotifications}
           />
+
+          <Link
+            href="/chat"
+            aria-label="Open chat"
+            className="hidden h-11 w-11 items-center justify-center rounded-xl border border-crm-border bg-white text-crm-heading shadow-theme-xs transition-colors hover:bg-gray-50 sm:flex"
+          >
+            <Mail className="h-4.5 w-4.5" />
+          </Link>
 
           <div className="hidden h-6 w-px bg-gray-200 sm:block" />
 

@@ -14,7 +14,7 @@ export function FormCard({
   className = "",
 }: FormCardProps) {
   return (
-    <div className={`crm-card max-w-2xl p-6 ${className}`.trim()}>
+    <div className={`crm-card max-w-2xl p-6 md:p-7 ${className}`.trim()}>
       {title ? (
         <div className="mb-6 border-b border-crm-border-soft pb-4">
           <h2 className="text-lg font-semibold text-crm-heading">{title}</h2>
