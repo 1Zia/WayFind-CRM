@@ -14,6 +14,10 @@ const outfit = Outfit({
 export const metadata: Metadata = {
   title: "WayFind",
   description: "WayFind CRM",
+  icons: {
+    icon: "/wayfind-logo.jpeg",
+    apple: "/wayfind-logo.jpeg",
+  },
 };
 
 export default function RootLayout({

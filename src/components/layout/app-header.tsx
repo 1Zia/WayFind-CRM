@@ -38,7 +38,7 @@ export function AppHeader({
   const searchTabs = getSearchTabsForUser(user);
 
   return (
-    <header className="sticky top-0 z-40 flex h-[88px] w-full border-b border-white/70 bg-white/85 shadow-[0_18px_45px_-36px_rgba(15,23,42,0.55)] backdrop-blur-2xl supports-[backdrop-filter]:bg-white/75">
+    <header className="sticky top-0 z-40 flex h-[88px] w-full border-b border-white/70 bg-crm-shell/85 shadow-[0_18px_45px_-36px_rgba(15,23,42,0.55)] backdrop-blur-2xl supports-[backdrop-filter]:bg-crm-shell/75">
       <div className="flex grow items-center justify-between gap-5 px-4 sm:px-7 md:px-10">
         <div className="flex min-w-0 flex-1 items-center gap-4">
           <button

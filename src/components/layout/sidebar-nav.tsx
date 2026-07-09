@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Zap, X } from "lucide-react";
+import { X } from "lucide-react";
 
 import { navigationGroups } from "@/config/navigation";
 import { canAccessRoute } from "@/lib/permissions";
 import type { users } from "@/db/schema";
+import { WayFindLogo } from "@/components/shared/wayfind-logo";
 
 type User = typeof users.$inferSelect;
 
@@ -39,9 +40,7 @@ export function SidebarNav({
           onClick={onMobileClose}
           className="flex items-center gap-3.5"
         >
-          <div className="liquid-glass-active flex h-10 w-10 items-center justify-center rounded-xl text-slate-900">
-            <Zap className="relative z-10 h-5 w-5 fill-slate-900" />
-          </div>
+          <WayFindLogo className="h-10 w-10 p-1.5" />
           <div>
             <p className="text-base font-bold tracking-tight text-crm-heading leading-tight">
               WayFind
@@ -114,7 +113,7 @@ export function SidebarNav({
 
   return (
     <>
-      <aside className="hidden w-[290px] shrink-0 flex-col border-r border-crm-border bg-[#f7f8fa] lg:flex h-screen sticky top-0">
+      <aside className="hidden h-screen w-[290px] shrink-0 flex-col border-r border-crm-border bg-crm-shell lg:sticky lg:top-0 lg:flex">
         {content}
       </aside>
 
@@ -126,7 +125,7 @@ export function SidebarNav({
             onClick={onMobileClose}
             className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm"
           />
-          <aside className="relative flex h-full w-[290px] max-w-[85vw] flex-col bg-[#f7f8fa] shadow-theme-xl">
+          <aside className="relative flex h-full w-[290px] max-w-[85vw] flex-col bg-crm-shell shadow-theme-xl">
             {content}
           </aside>
         </div>

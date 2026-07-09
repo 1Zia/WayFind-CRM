@@ -102,6 +102,7 @@ module.exports = {
         },
         crm: {
           body: "#f4f5f7",
+          shell: "#eef1f5",
           surface: "#ffffff",
           border: "#e5e7eb",
           "border-soft": "#eef0f3",
